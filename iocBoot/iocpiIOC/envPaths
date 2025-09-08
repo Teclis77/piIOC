@@ -1,0 +1,6 @@
+epicsEnvSet("IOC","iocpiIOC")
+epicsEnvSet("TOP","/home/xlabsrv2/epics/IOCs/piIOC")
+epicsEnvSet("SUPPORT","/home/xlabsrv2/epics/synApps_6_3/support")
+epicsEnvSet("ASYN","/home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2")
+epicsEnvSet("STREAM","/home/xlabsrv2/epics/synApps_6_3/support/StreamDevice-2-8-24")
+epicsEnvSet("EPICS_BASE","/home/xlabsrv2/epics")

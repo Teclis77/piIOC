@@ -1,0 +1,64 @@
+#################################################
+# ###                                       ### #
+# ### StreamDevice Protocol for             ### #
+# ### PI - C663 Mercury                     ### #
+# ###                                       ### #
+# ### author: D. Hampai - M. Montis         ### #
+# ###                                       ### #
+# ### Ref 1.0; 2025-08-27		    ### #
+#################################################
+
+###################
+# ### Globals ### #
+###################
+
+#Terminator = CR LF;
+Terminator = LF;
+#Terminator=CR;
+ReplyTimeout=1000;
+ReadTimeout=1000;
+#
+#       Protocols
+#
+##
+#       Discard Extra Inputs
+#	IF NECESSARY
+##
+#ExtraInput = Ignore;
+getModel {
+	out "VER?";
+#	in "%15c";
+	in "%s %s";
+}
+getError {
+	out "\$1 ERR?";
+	in "%d %d %d";
+}
+getMoving {
+        out "\$1 ONT? \$2";
+        in "%d %d %d=%b";
+}
+getStatus {
+	out "\$1 SVO? \$2";
+	in "%d %d %d=%b";
+}
+setStatus {
+        out "\$1 SVO \$2 %b";
+#        in "%d %d %d=%d";
+}
+getPos {
+	out "\$1 POS? \$2";
+	in "%d %d %d=%f";
+}
+setMovAbs {
+	out "\$1 MOV \$2 %f";
+}
+setMovRel {
+        out "\$1 MVR \$2 %f";
+}
+setInit {
+	out "\$1 \$3 \$2";
+}
+setHoming {
+        out "\$1 GOH \$2";
+}

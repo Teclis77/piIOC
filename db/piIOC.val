@@ -1,0 +1,16 @@
+#################################################
+# ###                                       ### #
+# ### Values			            ### #
+# ### PI - C663 Mercury                     ### #
+# ###                                       ### #
+# ### author: D. Hampai - M. Montis         ### #
+# ###                                       ### #
+# ### Ref 1.0; 2025-08-27                   ### #
+#################################################
+
+file db/piIOC.db {
+    pattern { card, axis, ASYNPORT, MOT, EGU, homing }
+        { 1, 1 , "serial_pi_1", "pi_1", grad, FRF }
+        { 2, 1 , "serial_pi_1", "pi_1", mm, FNL }
+        { 3, 1 , "serial_pi_1", "pi_1", mm, FNL }
+}
