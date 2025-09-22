@@ -32,15 +32,18 @@ getModel {
 }
 getError {
 	out "\$1 ERR?";
-	in "%d %d %d";
+#	in "%d %d %d";
+	in "%s %s %s";
 }
 getMoving {
         out "\$1 ONT? \$2";
-        in "%d %d %d=%b";
+#        in "%d %d %d=%b";
+	in "%s %s %2c%s";
 }
 getStatus {
 	out "\$1 SVO? \$2";
-	in "%d %d %d=%b";
+#	in "%d %d %d=%b";
+	in "%s %s %2c%s";
 }
 setStatus {
         out "\$1 SVO \$2 %b";
