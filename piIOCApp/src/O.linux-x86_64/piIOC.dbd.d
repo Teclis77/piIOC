@@ -71,7 +71,10 @@
     /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64.dbd \
     /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Array.dbd \
     /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64TimeSeries.dbd \
-    /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Misc.dbd
+    /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Misc.dbd \
+    /home/xlabsrv2/epics/dbd/PVAServerRegister.dbd \
+    /home/xlabsrv2/epics/dbd/PVACommonRegister.dbd \
+    /home/xlabsrv2/epics/dbd/qsrv.dbd
 
 /home/xlabsrv2/epics/dbd/base.dbd:
 /home/xlabsrv2/epics/dbd/menuGlobal.dbd:
@@ -147,4 +150,7 @@
 /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Array.dbd:
 /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64TimeSeries.dbd:
 /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Misc.dbd:
+/home/xlabsrv2/epics/dbd/PVAServerRegister.dbd:
+/home/xlabsrv2/epics/dbd/PVACommonRegister.dbd:
+/home/xlabsrv2/epics/dbd/qsrv.dbd:
 ../O.Common/piIOC.dbd: ../Makefile

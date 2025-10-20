@@ -131,7 +131,7 @@ epicsShareExtern dset *pvar_dset_devAaiSoft, *pvar_dset_devaaiStream,
     *pvar_dset_devLiSoft, *pvar_dset_devLiSoftCallback,
     *pvar_dset_devLiGeneralTime, *pvar_dset_devlonginStream,
     *pvar_dset_asynLiInt32, *pvar_dset_asynLiUInt32Digital,
-    *pvar_dset_asynLiInt64, *pvar_dset_devLoSoft,
+    *pvar_dset_asynLiInt64, *pvar_dset_devLoPDBUTag, *pvar_dset_devLoSoft,
     *pvar_dset_devLoSoftCallback, *pvar_dset_devlongoutStream,
     *pvar_dset_asynLoInt32, *pvar_dset_asynLoUInt32Digital,
     *pvar_dset_asynLoInt64, *pvar_dset_devLsiSoft,
@@ -171,7 +171,8 @@ epicsShareExtern dset *pvar_dset_devAaiSoft, *pvar_dset_devaaiStream,
     *pvar_dset_asynFloat32ArrayWfOut, *pvar_dset_asynFloat64ArrayWfIn,
     *pvar_dset_asynFloat64ArrayWfOut, *pvar_dset_asynInt32TimeSeries,
     *pvar_dset_asynFloat64TimeSeries, *pvar_dset_asynInt64ArrayWfIn,
-    *pvar_dset_asynInt64ArrayWfOut, *pvar_dset_asynInt64TimeSeries;
+    *pvar_dset_asynInt64ArrayWfOut, *pvar_dset_asynInt64TimeSeries,
+    *pvar_dset_devWfPDBDemo, *pvar_dset_devWfPDBDemoRepeat;
 
 static const char * const deviceSupportNames[] = {
     "devAaiSoft", "devaaiStream", "asynInt8ArrayAai", "asynInt16ArrayAai",
@@ -194,12 +195,12 @@ static const char * const deviceSupportNames[] = {
     "devI64outSoft", "devI64outSoftCallback", "devint64outStream",
     "asynInt64Out", "devLiSoft", "devLiSoftCallback", "devLiGeneralTime",
     "devlonginStream", "asynLiInt32", "asynLiUInt32Digital",
-    "asynLiInt64", "devLoSoft", "devLoSoftCallback", "devlongoutStream",
-    "asynLoInt32", "asynLoUInt32Digital", "asynLoInt64", "devLsiSoft",
-    "devLsiEnviron", "devlsiStream", "asynLsiOctetCmdResponse",
-    "asynLsiOctetWriteRead", "asynLsiOctetRead", "devLsoSoft",
-    "devLsoSoftCallback", "devLsoStdio", "devlsoStream",
-    "asynLsoOctetWrite", "devMbbiSoft", "devMbbiSoftRaw",
+    "asynLiInt64", "devLoPDBUTag", "devLoSoft", "devLoSoftCallback",
+    "devlongoutStream", "asynLoInt32", "asynLoUInt32Digital",
+    "asynLoInt64", "devLsiSoft", "devLsiEnviron", "devlsiStream",
+    "asynLsiOctetCmdResponse", "asynLsiOctetWriteRead",
+    "asynLsiOctetRead", "devLsoSoft", "devLsoSoftCallback", "devLsoStdio",
+    "devlsoStream", "asynLsoOctetWrite", "devMbbiSoft", "devMbbiSoftRaw",
     "devMbbiSoftCallback", "devmbbiStream", "asynMbbiInt32",
     "asynMbbiUInt32Digital", "devMbbiDirectSoft", "devMbbiDirectSoftRaw",
     "devMbbiDirectSoftCallback", "devmbbiDirectStream",
@@ -221,7 +222,7 @@ static const char * const deviceSupportNames[] = {
     "asynFloat32ArrayWfOut", "asynFloat64ArrayWfIn",
     "asynFloat64ArrayWfOut", "asynInt32TimeSeries",
     "asynFloat64TimeSeries", "asynInt64ArrayWfIn", "asynInt64ArrayWfOut",
-    "asynInt64TimeSeries"
+    "asynInt64TimeSeries", "devWfPDBDemo", "devWfPDBDemoRepeat"
 };
 
 static const dset * const devsl[] = {
@@ -258,7 +259,7 @@ static const dset * const devsl[] = {
     pvar_dset_devLiSoft, pvar_dset_devLiSoftCallback,
     pvar_dset_devLiGeneralTime, pvar_dset_devlonginStream,
     pvar_dset_asynLiInt32, pvar_dset_asynLiUInt32Digital,
-    pvar_dset_asynLiInt64, pvar_dset_devLoSoft,
+    pvar_dset_asynLiInt64, pvar_dset_devLoPDBUTag, pvar_dset_devLoSoft,
     pvar_dset_devLoSoftCallback, pvar_dset_devlongoutStream,
     pvar_dset_asynLoInt32, pvar_dset_asynLoUInt32Digital,
     pvar_dset_asynLoInt64, pvar_dset_devLsiSoft, pvar_dset_devLsiEnviron,
@@ -297,7 +298,8 @@ static const dset * const devsl[] = {
     pvar_dset_asynFloat64ArrayWfIn, pvar_dset_asynFloat64ArrayWfOut,
     pvar_dset_asynInt32TimeSeries, pvar_dset_asynFloat64TimeSeries,
     pvar_dset_asynInt64ArrayWfIn, pvar_dset_asynInt64ArrayWfOut,
-    pvar_dset_asynInt64TimeSeries
+    pvar_dset_asynInt64TimeSeries, pvar_dset_devWfPDBDemo,
+    pvar_dset_devWfPDBDemoRepeat
 };
 
 epicsShareExtern drvet *pvar_drvet_drvAsyn, *pvar_drvet_stream;
@@ -310,18 +312,20 @@ static struct drvet *drvsl[] = {
     pvar_drvet_stream};
 
 epicsShareExtern jlif *pvar_jlif_lnkCalcIf, *pvar_jlif_lnkConstIf,
-    *pvar_jlif_lnkDebugIf, *pvar_jlif_lnkStateIf, *pvar_jlif_lnkTraceIf;
+    *pvar_jlif_lnkDebugIf, *pvar_jlif_lnkStateIf, *pvar_jlif_lnkTraceIf,
+    *pvar_jlif_lsetPVA;
 
 static struct jlif *jlifsl[] = {
     pvar_jlif_lnkCalcIf,
     pvar_jlif_lnkConstIf,
     pvar_jlif_lnkDebugIf,
     pvar_jlif_lnkStateIf,
-    pvar_jlif_lnkTraceIf};
+    pvar_jlif_lnkTraceIf,
+    pvar_jlif_lsetPVA};
 
 typedef void (*reg_func)(void);
 epicsShareExtern reg_func pvar_func_AsynDriverInterfaceRegistrar,
-    pvar_func_arrInitialize, pvar_func_asSub,
+    pvar_func_QSRVRegistrar, pvar_func_arrInitialize, pvar_func_asSub,
     pvar_func_asynInterposeDelayRegister,
     pvar_func_asynInterposeEchoRegister,
     pvar_func_asynInterposeEosRegister,
@@ -329,11 +333,14 @@ epicsShareExtern reg_func pvar_func_AsynDriverInterfaceRegistrar,
     pvar_func_dbndInitialize, pvar_func_decInitialize,
     pvar_func_drvAsynIPPortRegisterCommands,
     pvar_func_drvAsynIPServerPortRegisterCommands,
-    pvar_func_rsrvRegistrar, pvar_func_streamRegistrar,
-    pvar_func_syncInitialize, pvar_func_tsInitialize,
-    pvar_func_utagInitialize;
+    pvar_func_installPVAAddLinkHook, pvar_func_refTrackRegistrar,
+    pvar_func_registerStartPVAServer, pvar_func_rsrvRegistrar,
+    pvar_func_streamRegistrar, pvar_func_syncInitialize,
+    pvar_func_tsInitialize, pvar_func_utagInitialize,
+    pvar_func_register_func_QSRV_image_demo;
 
 epicsShareExtern int * const pvar_int_CASDEBUG;
+epicsShareExtern int * const pvar_int_PDBProviderDebug;
 epicsShareExtern int * const pvar_int_asCaDebug;
 epicsShareExtern int * const pvar_int_atExitDebug;
 epicsShareExtern double * const pvar_double_boHIGHlimit;
@@ -353,6 +360,7 @@ epicsShareExtern int * const pvar_int_dbThreadRealtimeLock;
 epicsShareExtern int * const pvar_int_histogramSDELprecision;
 epicsShareExtern int * const pvar_int_lnkDebug_debug;
 epicsShareExtern int * const pvar_int_logClientDebug;
+epicsShareExtern int * const pvar_int_pvaLinkNWorkers;
 epicsShareExtern double * const pvar_double_seqDLYlimit;
 epicsShareExtern int * const pvar_int_seqDLYprecision;
 epicsShareExtern int * const pvar_int_streamDebug;
@@ -363,6 +371,7 @@ epicsShareExtern int * const pvar_int_streamMsgTimeStamped;
 
 static struct iocshVarDef vardefs[] = {
     {"CASDEBUG", iocshArgInt, pvar_int_CASDEBUG},
+    {"PDBProviderDebug", iocshArgInt, pvar_int_PDBProviderDebug},
     {"asCaDebug", iocshArgInt, pvar_int_asCaDebug},
     {"atExitDebug", iocshArgInt, pvar_int_atExitDebug},
     {"boHIGHlimit", iocshArgDouble, pvar_double_boHIGHlimit},
@@ -382,6 +391,7 @@ static struct iocshVarDef vardefs[] = {
     {"histogramSDELprecision", iocshArgInt, pvar_int_histogramSDELprecision},
     {"lnkDebug_debug", iocshArgInt, pvar_int_lnkDebug_debug},
     {"logClientDebug", iocshArgInt, pvar_int_logClientDebug},
+    {"pvaLinkNWorkers", iocshArgInt, pvar_int_pvaLinkNWorkers},
     {"seqDLYlimit", iocshArgDouble, pvar_double_seqDLYlimit},
     {"seqDLYprecision", iocshArgInt, pvar_int_seqDLYprecision},
     {"streamDebug", iocshArgInt, pvar_int_streamDebug},
@@ -419,6 +429,7 @@ int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
     registerDrivers(pbase, NELEMENTS(drvsl), driverSupportNames, drvsl);
     registerJLinks(pbase, NELEMENTS(jlifsl), jlifsl);
     runRegistrarOnce(pvar_func_AsynDriverInterfaceRegistrar);
+    runRegistrarOnce(pvar_func_QSRVRegistrar);
     runRegistrarOnce(pvar_func_arrInitialize);
     runRegistrarOnce(pvar_func_asSub);
     runRegistrarOnce(pvar_func_asynInterposeDelayRegister);
@@ -430,11 +441,15 @@ int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
     runRegistrarOnce(pvar_func_decInitialize);
     runRegistrarOnce(pvar_func_drvAsynIPPortRegisterCommands);
     runRegistrarOnce(pvar_func_drvAsynIPServerPortRegisterCommands);
+    runRegistrarOnce(pvar_func_installPVAAddLinkHook);
+    runRegistrarOnce(pvar_func_refTrackRegistrar);
+    runRegistrarOnce(pvar_func_registerStartPVAServer);
     runRegistrarOnce(pvar_func_rsrvRegistrar);
     runRegistrarOnce(pvar_func_streamRegistrar);
     runRegistrarOnce(pvar_func_syncInitialize);
     runRegistrarOnce(pvar_func_tsInitialize);
     runRegistrarOnce(pvar_func_utagInitialize);
+    runRegistrarOnce(pvar_func_register_func_QSRV_image_demo);
     iocshRegisterVariable(vardefs);
     return 0;
 }
