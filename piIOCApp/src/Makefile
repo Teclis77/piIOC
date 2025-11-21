@@ -24,11 +24,13 @@ piIOC_DBD += base.dbd
 piIOC_DBD += stream-base.dbd
 piIOC_DBD += drvAsynIPPort.dbd
 piIOC_DBD += asyn.dbd
+piIOC_DBD += calc.dbd
 
 # Add all the support libraries needed by this IOC
 #piIOC_LIBS += xxx
 piIOC_LIBS += stream
 piIOC_LIBS += asyn
+piIOC_LIBS += calc
 
 # piIOC_registerRecordDeviceDriver.cpp derives from piIOC.dbd
 piIOC_SRCS += piIOC_registerRecordDeviceDriver.cpp

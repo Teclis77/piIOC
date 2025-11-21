@@ -32,6 +32,7 @@
 SUPPORT=$(EPICS_BASE)/synApps_6_3/support
 ASYN=$(SUPPORT)/asyn-R4-44-2
 STREAM=$(SUPPORT)/StreamDevice-2-8-24
+CALC=$(SUPPORT)/calc-R3-7-5
 
 # If using the sequencer, point SNCSEQ at its top directory:
 #SNCSEQ = $(MODULES)/seq-ver

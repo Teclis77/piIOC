@@ -55,21 +55,30 @@ record(bo, "$(MOT):reqstatus_$(card)_$(axis)") {
 	field(ONAM, "1")  # Label for state 1
         field(PINI, "YES")
 }
-#record(bi, "$(MOT):status_$(card)_$(axis)") {
-record(stringin, "$(MOT):status_$(card)_$(axis)") {
+record(stringin, "$(MOT):ori_status_$(card)_$(axis)") {
         field(DESC, "Get Status $(card)_$(axis)")
         field(SCAN, "Passive")
         field(DTYP, "stream")
-#        field(ZNAM, "0")  # Label for state 0
-#        field(ONAM, "1")  # Label for state 1
         field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
         field(PINI, "NO")
+	field(FLNK, "$(MOT):status_$(card)_$(axis)")
+}
+record(stringin, "$(MOT):term_status_$(card)_$(axis)") {
+	field(DESC, "Terminator for Motor Status")
+	field(VAL, "$(onoff)")
+	field(PINI, "YES")
+}
+record(scalcout, "$(MOT):status_$(card)_$(axis)") {
+	field(DESC, "Extract Info On/Off")
+	field(INAA, "$(MOT):ori_status_$(card)_$(axis)")
+	field(INBB, "$(MOT):term_status_$(card)_$(axis)")
+	field(CALC, "AA=BB?1:0")
 }
 record(seq, "$(MOT):evalstatus_$(card)_$(axis)") {
         field(DO0, "1")
         field(LNK0, "$(MOT):err_$(card)_$(axis)")
         field(DOL1, "1")
-        field(LNK1, "$(MOT):status_$(card)_$(axis).PROC")
+        field(LNK1, "$(MOT):ori_status_$(card)_$(axis).PROC")
 }
 #
 #       ON/OFF Motor
@@ -111,21 +120,30 @@ record(bo, "$(MOT):reqmoving_$(card)_$(axis)") {
         field(ZNAM, "0")  # Label for state 0
         field(ONAM, "1")  # Label for state 1
 }
-#record(bi, "$(MOT):moving_$(card)_$(axis)") {
-record(stringin, "$(MOT):moving_$(card)_$(axis)") {
-        field(DESC, "Get Status Moving $(card)_$(axis)")
-        field(SCAN, "Passive")
-        field(DTYP, "stream")
- #       field(ZNAM, "0")  # Label for state 0
- #       field(ONAM, "1")  # Label for state 1
-        field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
-        field(PINI, "NO")
+record(stringin, "$(MOT):ori_moving_$(card)_$(axis)") {
+	field(DESC, "Get Status Moving $(card)_$(axis)")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
+	field(FLNK, "$(MOT):moving_$(card)_$(axis)")
+}
+record(stringin, "$(MOT):term_moving_$(card)_$(axis)") {
+	field(DESC, "Terminator for Motor Moving")
+	field(VAL, "$(ready)")
+	field(PINI, "YES")
+}
+record(scalcout, "$(MOT):moving_$(card)_$(axis)") {
+	field(DESC, "Extract Moving")
+	field(INAA, "$(MOT):ori_moving_$(card)_$(axis)")
+	field(INBB, "$(MOT):term_moving_$(card)_$(axis)")
+	field(CALC, "AA=BB?1:0")
 }
 record(seq, "$(MOT):evalmoving_$(card)_$(axis)") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT):err_$(card)_$(axis)")
-        field(DOL1, "1")
-        field(LNK1, "$(MOT):moving_$(card)_$(axis).PROC")
+	field(DO0, "1")
+	field(LNK0, "$(MOT):err_$(card)_$(axis)")
+	field(DOL1, "1")
+	field(LNK1, "$(MOT):ori_moving_$(card)_$(axis).PROC")
 }
 #
 #	MOVE ABSOLUTE

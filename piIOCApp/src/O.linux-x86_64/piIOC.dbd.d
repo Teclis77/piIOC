@@ -72,6 +72,13 @@
     /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Array.dbd \
     /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64TimeSeries.dbd \
     /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Misc.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/calc.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/transformRecord.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/sCalcoutRecord.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/aCalcoutRecord.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/sseqRecord.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/swaitRecord.dbd \
+    /home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/editSseq.dbd \
     /home/xlabsrv2/epics/dbd/PVAServerRegister.dbd \
     /home/xlabsrv2/epics/dbd/PVACommonRegister.dbd \
     /home/xlabsrv2/epics/dbd/qsrv.dbd
@@ -150,6 +157,13 @@
 /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Array.dbd:
 /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64TimeSeries.dbd:
 /home/xlabsrv2/epics/synApps_6_3/support/asyn-R4-44-2/dbd/devAsynInt64Misc.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/calc.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/transformRecord.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/sCalcoutRecord.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/aCalcoutRecord.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/sseqRecord.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/swaitRecord.dbd:
+/home/xlabsrv2/epics/synApps_6_3/support/calc-R3-7-5/dbd/editSseq.dbd:
 /home/xlabsrv2/epics/dbd/PVAServerRegister.dbd:
 /home/xlabsrv2/epics/dbd/PVACommonRegister.dbd:
 /home/xlabsrv2/epics/dbd/qsrv.dbd:
