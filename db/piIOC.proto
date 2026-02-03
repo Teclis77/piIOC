@@ -59,9 +59,10 @@ setMovAbs {
 setMovRel {
         out "\$1 MVR \$2 %f";
 }
-setInit {
+setHoming {
+#setInit {
 	out "\$1 \$3 \$2";
 }
-setHoming {
-        out "\$1 GOH \$2";
-}
+#setHoming {
+#        out "\$1 GOH \$2";
+#}
