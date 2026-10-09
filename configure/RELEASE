@@ -38,7 +38,7 @@ CALC=$(SUPPORT)/calc-R3-7-5
 #SNCSEQ = $(MODULES)/seq-ver
 
 # EPICS_BASE should appear last so earlier modules can override stuff:
-EPICS_BASE = /home/xlabsrv2/epics
+EPICS_BASE = /home/xlabsrv11/epics
 
 # Set RULES here if you want to use build rules from somewhere
 # other than EPICS_BASE:

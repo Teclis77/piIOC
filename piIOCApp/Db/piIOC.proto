@@ -5,7 +5,7 @@
 # ###                                       ### #
 # ### author: D. Hampai - M. Montis         ### #
 # ###                                       ### #
-# ### Ref 1.0; 2025-08-27		    ### #
+# ### Ref 2.0; 2026-10-08		    ### #
 #################################################
 
 ###################
@@ -60,9 +60,18 @@ setMovRel {
         out "\$1 MVR \$2 %f";
 }
 setHoming {
-#setInit {
 	out "\$1 \$3 \$2";
 }
-#setHoming {
-#        out "\$1 GOH \$2";
-#}
+setStop {
+	out "\$1 HLT \$2";
+}
+getLim {
+	out "\$1 SRG? \$2 1";
+}
+getVel {
+	out "\$1 VEL? \$2";
+	in "%d %d %d=%f";
+}
+setVel {
+	out "\$1 VEL \$2 %f";
+}

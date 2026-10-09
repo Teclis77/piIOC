@@ -465,7 +465,7 @@ static struct iocshVarDef vardefs[] = {
 int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
 {
     static int executed = 0;
-    const char *bldTop = "/home/xlabsrv2/epics/IOCs/piIOC";
+    const char *bldTop = "/home/xlabsrv11/epics/IOCs/piIOC";
     const char *envTop = getenv("TOP");
 
     if (envTop && strcmp(envTop, bldTop)) {
