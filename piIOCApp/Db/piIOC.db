@@ -99,7 +99,7 @@ record(ai, "$(MOT)_$(card)_$(axis):ms_status_opt") {
         field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
 	field(PINI, "NO")
 }
-record(ai, "$(MOT)_$(card)_$(axis):lim_status") {
+record(stringin, "$(MOT)_$(card)_$(axis):lim_status") {
 	field(DESC, "Status Limit Switch")
 	field(SCAN, "Passive")
 	field(DTYP, "stream")

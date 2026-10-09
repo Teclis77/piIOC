@@ -1,0 +1,246 @@
+//###############################################
+//# ###					    ### #
+//# ### Epics SNL Routines for		    ### #
+//# ### Status Motor Device		    ### #
+//# ###					    ### #
+//# ### author: D. Hampai - M. Montis	    ### #
+//# ###					    ### #
+//# ### Ref 2.0; 2026-08-02		    ### #
+//###############################################
+//#
+//
+// put "program statusIOC" with IOC generalized
+program statuspi
+//
+%{
+#include <math.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <epicsThread.h>
+#include "motor_status.h"
+#include "res_utils.h"
+
+// Dichiarazione globale della variabile MotorStatus
+MotorStatus g_motor_status;
+char g_motor_status_char;
+TotalStatus g_motor_status_opt;
+char g_motor_status_opt_char;
+}%
+//
+option +r;
+/*	PV/CA Variables
+Num	Name			type		Associated
+
+1	mres			float		{motor}_{card}_{axis}:mres
+2	polarity		int		{motor}_{card}_{axis}:polarity
+3	status_mode		int		{motor}_{card}_{axis}:status_mode
+4	ask_request		int		{motor}_{card}_{axis}:ask_request
+5	check_err		stringin	{motor}_{card}_{axis}:err
+6	ms_status		stringin	{motor}_{card}_{axis}:ms_status
+7	ms_status_opt		stringin	{motor}_{card}_{axis}:ms_status_opt
+8	motor_status		int		{motor}_{card}_{axis}:motor_status
+9	lim_pos			int		{motor}_{card}_{axis}:limit_right
+10	lim_neg			int		{motor}_{card}_{axis}:limit_left
+DELETE11	mot_moving		int		{motor}_{card}_{axis}:moving
+11	b_moving		int		{motor}_{card}_{axis}:moving
+12	reqpos			int		{motor}_{card}_{axis}:reqpos
+13	atc_pos			float		{motor}_{card}_{axis}:act_pos
+14	pos			float		{motor}_{card}_{axis}:pos
+15	reqvel			int		{motor}_{card}_{axis}:reqvel
+16	act_vel			float		{motor}_{card}_{axis}:act_vel
+17	real_vel		float		{motor}_{card}_{axis}:real_vel
+*/
+// PV/CA
+float mres; assign mres to "{motor}_{card}_{axis}:mres"; monitor mres;
+int polarity; assign polarity to "{motor}_{card}_{axis}:polarity"; monitor polarity;
+int status_mode; assign status_mode to "{motor}_{card}_{axis}:status_mode"; monitor status_mode;
+int ask_request; assign ask_request to "{motor}_{card}_{axis}:ask_request"; monitor ask_request;
+string check_err; assign check_err to "{motor}_{card}_{axis}:err"; monitor check_err;
+string ms_status; assign ms_status to "{motor}_{card}_{axis}:ms_status"; monitor ms_status;
+string ms_status_opt; assign ms_status_opt to "{motor}_{card}_{axis}:ms_status_opt"; monitor ms_status_opt;
+int  motor_status; assign motor_status to "{motor}_{card}_{axis}:motor_status"; monitor motor_status;
+int lim_pos; assign lim_pos to "{motor}_{card}_{axis}:limit_right"; monitor lim_pos;
+int lim_neg; assign lim_neg to "{motor}_{card}_{axis}:limit_left"; monitor lim_neg;
+//int mot_moving; assign mot_moving to "{motor}_{card}_{axis}:moving"; monitor mot_moving;
+int b_moving; assign b_moving to "{motor}_{card}_{axis}:moving"; monitor b_moving;
+int reqpos; assign reqpos to "{motor}_{card}_{axis}:reqpos"; monitor reqpos;
+float act_pos; assign act_pos to "{motor}_{card}_{axis}:act_pos"; monitor act_pos;
+float pos; assign pos to "{motor}_{card}_{axis}:pos"; monitor pos;
+int reqvel; assign reqvel to "{motor}_{card}_{axis}:reqvel"; monitor reqvel;
+float act_vel; assign act_vel to "{motor}_{card}_{axis}:act_vel"; monitor act_vel;
+float real_vel; assign real_vel to "{motor}_{card}_{axis}:real_vel"; monitor real_vel;
+
+// PV/CA .PROC
+int ms_status_proc; assign ms_status_proc to "{motor}_{card}_{axis}:ms_status.PROC";
+int ms_status_opt_proc; assign ms_status_opt_proc to "{motor}_{card}_{axis}:ms_status_opt.PROC";
+
+//Local Variables
+int mot_moving;
+
+string lc_motor;
+string lc_card;
+string lc_axis;
+string actual_motor;
+char motor_status_char;
+char motor_status_opt_char;
+string motor_name;
+int ismoving;
+float get_pol;
+//
+//
+ss motor_snl {
+	state init {
+		when () {
+			strcpy(lc_motor,macValueGet("motor"));
+			strcpy(lc_card,macValueGet("card"));
+			strcpy(lc_axis,macValueGet("axis"));
+			status_mode = 0;
+			pvPut(status_mode, SYNC);
+			printf("Init done\n");
+			pvGet(mres,SYNC);
+			pvGet(polarity,SYNC);
+			get_pol = 1;
+		} state idle
+	}
+	state idle {
+		when(status_mode==1) {
+			printf("motor %s, card %s, axis %s, status_mode %d\n", lc_motor, lc_card, lc_axis, status_mode);
+			epicsThreadSleep(1.0);
+		} state check_err
+		when(reqpos==1) {
+			printf("Request Position\n");
+			status_mode=3;
+			pvPut(status_mode,SYNC);
+		} state check_err
+		when(reqvel==1) {
+			printf("Request Velocity\n");
+			status_mode=4;
+			pvPut(status_mode,SYNC);
+		} state check_err
+		when() {
+//			serve solo per debug... poi da togliere
+//			printf("IOC%s_%s waiting for check", lc_card, lc_axis);
+			epicsThreadSleep(1.0);
+		} state idle
+	}
+//
+	state check_status {
+		when () {
+			ms_status_proc = 1;
+			pvPut(ms_status_proc, SYNC);
+			epicsThreadSleep(0.1);
+//
+			pvGet(ms_status, SYNC);
+//
+// Parsing SVO?
+			if (parse_svo(ms_status, &g_motor_status) != 0) {
+				printf("ERRORE: parsing SVO? fallito (risposta: '%s')\n", ms_status);
+			} else {
+				printf("SVO? = '%s' -> motor_on = %d\n", ms_status, g_motor_status.motor_on);
+			}
+// 0 = spento, 1 = acceso
+			motor_status = g_motor_status.motor_on;
+			pvPut(motor_status, SYNC);
+//
+			if (g_motor_status.motor_on == 0) {
+				printf("ERRORE: motore spento! (SVO? = 0)\n");
+			}
+			status_mode = 2;
+			pvPut(status_mode, SYNC);
+		} state check_err
+	}
+// motor_status_opt_char
+	state check_status_opt {
+		when() {
+			ms_status_opt_proc = 1;
+			pvPut(ms_status_opt_proc,SYNC);
+			epicsThreadSleep(0.1);
+//
+			pvGet(ms_status_opt,SYNC);
+			motor_status_opt_char = ms_status_opt[0];
+//
+			parse_total_status(motor_status_opt_char, &g_motor_status_opt);
+//
+//			if (lc_axis == "1") {
+			if (strcmp(lc_axis, "1") == 0) {
+				mot_moving = g_motor_status_opt.axis1_moving;
+			} else if (strcmp(lc_axis, "2") == 0) {
+				mot_moving = g_motor_status_opt.axis2_moving;
+			} else if (strcmp(lc_axis, "3") == 0) {
+				mot_moving = g_motor_status_opt.axis3_moving;
+			} else {
+				mot_moving = g_motor_status_opt.axis4_moving;
+			}
+//			pvPut(mot_moving,SYNC);
+			printf("Is It Moving axis %s? = %d\n", lc_axis,mot_moving);
+
+			if (mot_moving == 0) {
+				b_moving = 0;
+			} else {
+				b_moving = 1;
+			}
+
+			pvPut(b_moving,SYNC);
+//
+			/* Oppure debug rapido */
+			print_total_status(motor_status_opt_char);
+			status_mode=3;
+			pvPut(status_mode,SYNC);
+		} state check_err
+	}
+	state check_position {
+		when() {
+			pvPut(act_pos,SYNC);
+			epicsThreadSleep(0.1);
+//
+			pvGet(act_pos,SYNC);
+			pos = mech_to_real(mres,act_pos,get_pol);
+			printf("The position is %.3f\n", pos);
+			pvPut(pos,SYNC);
+			reqpos=0;
+			pvPut(reqpos,SYNC);
+			status_mode=4;
+			pvPut(status_mode,SYNC);
+		} state check_err
+	}
+	state check_velocity {
+		when() {
+			pvPut(act_vel,SYNC);
+			epicsThreadSleep(0.1);
+//
+			pvGet(act_vel,SYNC);
+			real_vel = mech_to_real(mres,act_vel,get_pol);
+			printf("The velocity is %.3f\n", real_vel);
+			pvPut(real_vel,SYNC);
+			reqvel=0;
+			pvPut(reqvel,SYNC);
+			status_mode=0;
+			pvPut(status_mode,SYNC);
+		} state check_err
+	}
+	state check_err {
+		when(status_mode==1) {
+			printf("Check Error in State %d\n", status_mode);
+			pvPut(check_err, SYNC);
+		} state check_status
+		when(status_mode==2) {
+			printf("Check Error in State %d\n", status_mode);
+			pvPut(check_err, SYNC);
+		} state check_status_opt
+		when(status_mode==3) {
+			printf("Check Error in State %d\n", status_mode);
+			pvPut(check_err, SYNC);
+		} state check_position
+		when(status_mode==4) {
+			printf("Check Error in State %d\n", status_mode);
+			pvPut(check_err, SYNC);
+		} state check_velocity
+		when() {
+			printf("Check Error in State %d\n", status_mode);
+			pvPut(check_err, SYNC);
+		} state idle
+	}
+}

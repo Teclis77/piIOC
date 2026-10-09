@@ -37,13 +37,13 @@ getError {
 }
 getMoving {
         out "\$1 ONT? \$2";
-#        in "%d %d %d=%b";
-	in "%s %s %2c%s";
+        in "%d %d %d=%d";
+#	in "%s %s %2c%s";
 }
 getStatus {
 	out "\$1 SVO? \$2";
-#	in "%d %d %d=%b";
-	in "%s %s %2c%s";
+	in "%d %d %d=%d";
+#	in "%s %s %2c%s";
 }
 setStatus {
         out "\$1 SVO \$2 %b";
@@ -67,6 +67,8 @@ setStop {
 }
 getLim {
 	out "\$1 SRG? \$2 1";
+#	in "%d %d %d %d=%s";
+	in "%#s";
 }
 getVel {
 	out "\$1 VEL? \$2";

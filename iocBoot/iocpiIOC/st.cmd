@@ -36,3 +36,11 @@ iocInit
 
 ## Start any sequence programs
 #seq sncxxx,"user=xlabsrv2"
+#seq statuspi,"user=cts,server=xlabsrv11,motor=pi_1,card=1,axis=1"
+#seq actionpi,"user=cts,server=xlabsrv11,motor=pi_1,card=1,axis=1"
+#seq statuspi,"user=cts,server=xlabsrv11,motor=pi_1,card=2,axis=1"
+seq actionpi,"user=cts,server=xlabsrv11,motor=pi_1,card=2,axis=1"
+#seq statuspi,"user=cts,server=xlabsrv11,motor=pi_1,card=3,axis=1"
+#seq actionpi,"user=cts,server=xlabsrv11,motor=pi_1,card=3,axis=1"
+#seq statuspi,"user=cts,server=xlabsrv11,motor=pi_1,card=4,axis=1"
+#seq actionpi,"user=cts,server=xlabsrv11,motor=pi_1,card=4,axis=1"

@@ -343,7 +343,8 @@ static struct jlif *jlifsl[] = {
 typedef void (*reg_func)(void);
 epicsShareExtern reg_func pvar_func_AsynDriverInterfaceRegistrar,
     pvar_func_QSRVRegistrar, pvar_func_aCalcMonitorMemRegister,
-    pvar_func_acalcTotalAllocatedMemoryRegister, pvar_func_arrInitialize,
+    pvar_func_acalcTotalAllocatedMemoryRegister,
+    pvar_func_actionpiRegistrar, pvar_func_arrInitialize,
     pvar_func_arrayTestRegister, pvar_func_asSub,
     pvar_func_asynInterposeDelayRegister,
     pvar_func_asynInterposeEchoRegister,
@@ -492,6 +493,7 @@ int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
     runRegistrarOnce(pvar_func_QSRVRegistrar);
     runRegistrarOnce(pvar_func_aCalcMonitorMemRegister);
     runRegistrarOnce(pvar_func_acalcTotalAllocatedMemoryRegister);
+    runRegistrarOnce(pvar_func_actionpiRegistrar);
     runRegistrarOnce(pvar_func_arrInitialize);
     runRegistrarOnce(pvar_func_arrayTestRegister);
     runRegistrarOnce(pvar_func_asSub);
