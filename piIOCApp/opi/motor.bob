@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Saved on 2026-10-07 14:30:11 by laphampai-->
+<display version="2.0.0">
+  <name>$(M)_$(C)_$(A)</name>
+  <widget type="label" version="2.0.0">
+    <name>Title</name>
+    <class>TITLE</class>
+    <text>Control $(M)_$(C)_$(A)</text>
+    <x use_class="true">0</x>
+    <y use_class="true">0</y>
+    <width>410</width>
+    <height>31</height>
+    <font use_class="true">
+      <font name="Header 1" family="Liberation Sans" style="BOLD" size="22.0">
+      </font>
+    </font>
+    <foreground_color use_class="true">
+      <color name="Text" red="0" green="0" blue="0">
+      </color>
+    </foreground_color>
+    <transparent use_class="true">true</transparent>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Model Version</name>
+    <pv_name>$(M):model</pv_name>
+    <x>125</x>
+    <y>36</y>
+    <width>150</width>
+    <background_color>
+      <color name="Header_ForeGround" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Model</name>
+    <text>Model version:</text>
+    <x>11</x>
+    <y>32</y>
+    <width>110</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="action_button" version="3.0.0">
+    <name>Status $(M)_$(C)_$(A)</name>
+    <actions>
+      <action type="write_pv">
+        <description>Status</description>
+        <pv_name>$(M)_$(C)_$(A):ask_request</pv_name>
+        <value>1</value>
+      </action>
+    </actions>
+    <x>10</x>
+    <y>90</y>
+    <width>150</width>
+    <height>90</height>
+    <tooltip>$(actions)</tooltip>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Position</name>
+    <pv_name>$(M)_$(C)_$(A):pos</pv_name>
+    <x>180</x>
+    <y>90</y>
+    <width>150</width>
+    <height>30</height>
+    <background_color>
+      <color name="Header_ForeGround" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label Position</name>
+    <text>Position</text>
+    <x>330</x>
+    <y>90</y>
+    <width>110</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Velocity</name>
+    <pv_name>$(M)_$(C)_$(A):real_vel</pv_name>
+    <x>180</x>
+    <y>120</y>
+    <width>150</width>
+    <height>30</height>
+    <background_color>
+      <color name="Header_ForeGround" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label Velocity</name>
+    <text>Velocity</text>
+    <x>330</x>
+    <y>120</y>
+    <width>110</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label Moving</name>
+    <text>Moving</text>
+    <x>330</x>
+    <y>150</y>
+    <width>110</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>Moving</name>
+    <pv_name>$(M)_$(C)_$(A):moving</pv_name>
+    <x>180</x>
+    <y>150</y>
+    <width>150</width>
+    <height>30</height>
+    <off_color>
+      <color name="On" red="0" green="255" blue="0">
+      </color>
+    </off_color>
+    <on_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </on_color>
+    <square>true</square>
+    <labels_from_pv>true</labels_from_pv>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>Busy</name>
+    <pv_name>$(M)_$(C)_$(A):busy</pv_name>
+    <x>530</x>
+    <y>20</y>
+    <width>150</width>
+    <height>42</height>
+    <off_label>Busy</off_label>
+    <off_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </off_color>
+    <square>true</square>
+    <rules>
+      <rule name="Led" prop_id="off_color" out_exp="false">
+        <exp bool_exp="pvStr0==&quot;0&quot;">
+          <value>
+            <color name="MAJOR" red="255" green="0" blue="0">
+            </color>
+          </value>
+        </exp>
+        <exp bool_exp="pvStr0==&quot;1&quot;">
+          <value>
+            <color name="OK" red="0" green="255" blue="0">
+            </color>
+          </value>
+        </exp>
+        <pv_name>$(M)_$(C)_$(A):busy</pv_name>
+      </rule>
+      <rule name="Status" prop_id="off_label" out_exp="false">
+        <exp bool_exp="pvStr0==&quot;0&quot;">
+          <value>Busy</value>
+        </exp>
+        <exp bool_exp="pvStr0==&quot;1&quot;">
+          <value>Ready</value>
+        </exp>
+        <pv_name>$(M)_$(C)_$(A):busy</pv_name>
+      </rule>
+    </rules>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Sinc. Status</name>
+    <x>140</x>
+    <y>490</y>
+    <width>150</width>
+    <height>30</height>
+    <visible>false</visible>
+    <scripts>
+      <script file="poll_motor_status.py">
+        <pv_name>sim://flipflop(1)</pv_name>
+        <pv_name trigger="false">$(M)_$(C)_$(A):ask_request.PROC</pv_name>
+      </script>
+    </scripts>
+  </widget>
+  <widget type="action_button" version="3.0.0">
+    <name>Action Button</name>
+    <actions execute_as_one="true">
+      <action type="execute">
+        <description>Exit</description>
+        <script file="close_window.py">
+        </script>
+      </action>
+    </actions>
+    <x>10</x>
+    <y>400</y>
+    <width>440</width>
+    <height>90</height>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label Unity</name>
+    <text>Meas. Unity</text>
+    <x>330</x>
+    <y>180</y>
+    <width>110</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Velocity_3</name>
+    <pv_name>$(M)_$(C)_$(A):egu</pv_name>
+    <x>180</x>
+    <y>180</y>
+    <width>150</width>
+    <height>30</height>
+    <background_color>
+      <color name="Header_ForeGround" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="action_button" version="3.0.0">
+    <name>Homing $(M)_$(C)_$(A)</name>
+    <actions>
+      <action type="write_pv">
+        <description>Homing</description>
+        <pv_name>$(M)_$(C)_$(A):reqhome</pv_name>
+        <value>1</value>
+      </action>
+    </actions>
+    <x>10</x>
+    <y>240</y>
+    <width>149</width>
+    <height>40</height>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>MovAbs $(M)_$(C)_$(A)</name>
+    <pv_name>$(M)_$(C)_$(A):setma</pv_name>
+    <x>180</x>
+    <y>240</y>
+    <width>150</width>
+    <height>40</height>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>MovRel $(M)_$(C)_$(A)</name>
+    <pv_name>$(M)_$(C)_$(A):setmr</pv_name>
+    <x>180</x>
+    <y>280</y>
+    <width>150</width>
+    <height>40</height>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Set Velocity $(M)_$(C)_$(A)</name>
+    <pv_name>$(M)_$(C)_$(A):setve</pv_name>
+    <x>180</x>
+    <y>320</y>
+    <width>150</width>
+    <height>40</height>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>Lim_Sup</name>
+    <pv_name>$(M)_$(C)_$(A):limit_right</pv_name>
+    <x>650</x>
+    <y>120</y>
+    <width>30</width>
+    <height>30</height>
+    <off_color>
+      <color name="OK" red="0" green="255" blue="0">
+      </color>
+    </off_color>
+    <on_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </on_color>
+    <square>true</square>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Lim_Sup</name>
+    <text>Limit Switch Sup.</text>
+    <x>520</x>
+    <y>120</y>
+    <width>130</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>Lim_Inf</name>
+    <pv_name>$(M)_$(C)_$(A):limit_left</pv_name>
+    <x>650</x>
+    <y>150</y>
+    <width>30</width>
+    <height>30</height>
+    <off_color>
+      <color name="OK" red="0" green="255" blue="0">
+      </color>
+    </off_color>
+    <on_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </on_color>
+    <square>true</square>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Lim_Inf</name>
+    <text>Limit Switch Inf.</text>
+    <x>520</x>
+    <y>150</y>
+    <width>130</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Error</name>
+    <pv_name>$(M)_$(C)_$(A):err</pv_name>
+    <x>480</x>
+    <y>440</y>
+    <width>200</width>
+    <height>50</height>
+    <horizontal_alignment>1</horizontal_alignment>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Error</name>
+    <text>Error</text>
+    <x>510</x>
+    <y>410</y>
+    <width>130</width>
+    <height>30</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="action_button" version="3.0.0">
+    <name>Motor On/Off</name>
+    <actions>
+      <action type="write_pv">
+        <description>On/Off</description>
+        <pv_name>$(M)_$(C)_$(A):reqmotor</pv_name>
+        <value>1</value>
+      </action>
+    </actions>
+    <pv_name>$(M)_$(C)_$(A):reqmotor</pv_name>
+    <text>On/Off</text>
+    <x>520</x>
+    <y>90</y>
+    <width>130</width>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>On/Off</name>
+    <pv_name>$(M)_$(C)_$(A):motor_status</pv_name>
+    <x>650</x>
+    <y>90</y>
+    <width>30</width>
+    <height>30</height>
+    <off_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </off_color>
+    <on_color>
+      <color name="OK" red="0" green="255" blue="0">
+      </color>
+    </on_color>
+    <square>true</square>
+  </widget>
+  <widget type="action_button" version="3.0.0">
+    <name>Emergency Stop</name>
+    <actions>
+      <action type="write_pv">
+        <description>Write PV</description>
+        <pv_name>$(M)_$(C)_$(A):stop</pv_name>
+        <value>1</value>
+      </action>
+    </actions>
+    <text>Emergency Stop</text>
+    <x>570</x>
+    <y>310</y>
+    <width>110</width>
+    <height>90</height>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="Header_ForeGround" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <background_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </background_color>
+  </widget>
+</display>

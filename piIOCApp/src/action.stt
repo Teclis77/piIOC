@@ -1,0 +1,220 @@
+//###############################################
+//# ###                                     ### #
+//# ### Epics SNL Routines for              ### #
+//# ### Action Motor Device                 ### #
+//# ###                                     ### #
+//# ### author: D. Hampai - M. Montis       ### #
+//# ###                                     ### #
+//# ### Ref 2.0; 2026-08-02                 ### #
+//###############################################
+//#
+//
+// put "program actionIOC" with IOC generalized
+program actionpi
+
+%{
+#include <math.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <epicsThread.h>
+#include "motor_status.h"
+#include "res_utils.h"
+
+// Dichiarazione globale della variabile MotorStatus - temporaneamente disabilitata
+/*
+MotorStatus g_motor_status;
+char g_motor_status_char;
+TotalStatus g_motor_status_opt;
+char g_motor_status_opt_char;
+*/
+}%
+//
+option +r;
+/*      PV/CA Variables
+Num     Name                    type            Associated
+1	check_err		stringin	{motor}_{card}_{axis}:err
+2	mres			float		{motor}_{card}_{axis}:mres
+3	polarity		int		{motor}_{card}_{axis}:polarity
+4	reqmotor		int		{motor}_{card}_{axis}:reqmotor
+5	motor			int		{motor}_{card}_{axis}:motor
+6	reqhome			int		{motor}_{card}_{axis}:reqhome
+7	home			int		{motor}_{card}_{axis}:home
+8	setma			float		{motor}_{card}_{axis}:setma
+9	ma			float		{motor}_{card}_{axis}:ma
+10	setmr			float		{motor}_{card}_{axis}:setmr
+11	mr			float		{motor}_{card}_{axis}:mr
+12	setvel			float		{motor}_{card}_{axis}:setve
+13	vel			float		{motor}_{card}_{axis}:vel
+*/
+// PV/CA
+string check_err_act; assign check_err_act to "{motor}_{card}_{axis}:err"; monitor check_err_act;
+float mres; assign mres to "{motor}_{card}_{axis}:mres"; monitor mres;
+int polarity; assign polarity to "{motor}_{card}_{axis}:polarity"; monitor polarity;
+int reqmotor; assign reqmotor to "{motor}_{card}_{axis}:reqmotor"; monitor reqmotor;
+int motor; assign motor to "{motor}_{card}_{axis}:motor"; monitor motor;
+int reqhome; assign reqhome to "{motor}_{card}_{axis}:reqhome"; monitor reqhome;
+int home; assign home to "{motor}_{card}_{axis}:home"; monitor home;
+float setma; assign setma to "{motor}_{card}_{axis}:setma"; monitor setma;
+float ma; assign ma to "{motor}_{card}_{axis}:ma"; monitor ma;
+float setmr; assign setmr to "{motor}_{card}_{axis}:setmr"; monitor setmr;
+float mr; assign mr to "{motor}_{card}_{axis}:mr"; monitor mr;
+float setvel; assign setvel to "{motor}_{card}_{axis}:setve"; monitor setvel;
+float vel; assign vel to "{motor}_{card}_{axis}:vel"; monitor vel;
+//Local Variables
+int status_controller;
+int status_ma;
+int status_mr;
+int status_vel;
+float ma_mres;
+float mr_mres;
+float setma_prev;
+float setmr_prev;
+float setvel_prev;
+float vel_pol;
+string lc_motor;
+string lc_card;
+string lc_axis;
+//
+ss motor_action {
+	state init {
+		when () {
+			strcpy(lc_motor,macValueGet("motor"));
+			strcpy(lc_card,macValueGet("card"));
+			strcpy(lc_axis,macValueGet("axis"));
+			printf("Action Init done\n");
+			pvGet(mres,SYNC);
+			pvGet(polarity,SYNC);
+			printf("Init Action-SNL for Motor %s_%s_%s\n", lc_motor, lc_card, lc_axis);
+			setma_prev = setma;
+			setmr_prev = setmr;
+			setvel_prev = setvel;
+		} state idle
+	}
+//
+	state idle {
+// Go to actions
+		when(reqmotor==1) {
+			printf("Request On/Off Motor\n");
+		} state check_err
+		when(reqhome==1) {
+			printf("Homing for %s_%s_%s\n", lc_motor, lc_card, lc_axis);
+		} state check_err
+		when(setma != setma_prev) {
+			printf("Move Abs for %s_%s_%s=%.3f\n", lc_motor, lc_card, lc_axis, setma);
+			setma_prev = setma;
+			status_ma = 1;
+		} state check_err
+		when(setmr != setmr_prev) {
+			printf("Move Rel for %s_%s_%s=%.3f\n", lc_motor, lc_card, lc_axis, setmr);
+//			setmr_prev = 0;
+			setmr_prev = setmr;
+			status_mr = 1;
+		} state check_err
+		when(setvel != setvel_prev) {
+			printf("Vel for %s_%s_%s=%.3f\n", lc_motor, lc_card, lc_axis, setvel);
+			setvel_prev = setvel;
+			status_vel = 1;
+		} state check_err
+// Check Actions
+		when() {
+			pvGet(reqmotor,SYNC);
+			epicsThreadSleep(0.1);
+			pvGet(reqhome,SYNC);
+			epicsThreadSleep(0.1);
+			pvGet(setma,SYNC);
+			epicsThreadSleep(0.1);
+			pvGet(setmr,SYNC);
+			epicsThreadSleep(0.1);
+			pvGet(setvel,SYNC);
+			epicsThreadSleep(0.5);
+		} state idle
+	}
+//
+	state act_motor {
+		when() {
+			if (status_controller==0) {
+				status_controller=1;
+			} else {
+				status_controller=0;
+			}
+			printf("Motor is On(1)/Off(0) = %d\n", status_controller);
+			motor=status_controller;
+			pvPut(motor,SYNC);
+			reqmotor = 0;
+			pvPut(reqmotor,SYNC);
+		} state check_err
+	}
+//
+	state act_homing {
+		when() {
+			home=1;
+			pvPut(home,SYNC);
+			reqhome = 0;
+			pvPut(reqhome,SYNC);
+		} state check_err
+	}
+//
+        state act_ma {
+                when() {
+//			ma_mres = setma;
+			ma = real_to_mech(mres,setma,polarity);
+			pvPut(ma,SYNC);
+                } state check_err
+        }
+//
+	state act_mr {
+		when() {
+			mr = real_to_mech(mres,setmr,polarity);
+			pvPut(mr,SYNC);
+			setmr = 0;
+			pvPut(setmr,SYNC);
+			setmr_prev = 0;
+		} state check_err
+	}
+//
+	state act_vel {
+		when() {
+//
+//		PER LA VELOCIT° VA TOLTA LA POLARITA' -> AGGIUNGERE FUNZIONE IN .C
+//
+			vel_pol = 1.0;
+			vel = real_to_mech(mres,setvel,vel_pol);
+			pvPut(vel,SYNC);
+		} state check_err
+	}
+
+
+//
+        state check_err {
+		when(reqmotor==1) {
+			printf("Check Error in Request Mode\n");
+			pvPut(check_err_act,SYNC);
+		} state act_motor
+		when(reqhome==1) {
+			printf("Check Error in Homing Mode\n");
+			pvPut(check_err_act,SYNC);
+		} state act_homing
+		when(status_ma==1) {
+			printf("Check Error in Move Abs Mode\n");
+			status_ma = 0;
+			pvPut(check_err_act,SYNC);
+		} state act_ma
+		when(status_mr==1) {
+			printf("Check Error in Move Rel Mode\n");
+			status_mr = 0;
+			pvPut(check_err_act,SYNC);
+		} state act_mr
+		when(status_vel==1) {
+			printf("Check Error in Velocity Mode\n");
+			status_vel = 0;
+			pvPut(check_err_act,SYNC);
+		} state act_vel
+		when() {
+			printf("Check Error in State End of Cycle\n");
+			pvPut(check_err_act,SYNC);
+		} state idle
+	}
+}

@@ -5,7 +5,7 @@
 # ###                                       ### #
 # ### author: D. Hampai - M. Montis         ### #
 # ###                                       ### #
-# ### Ref 1.0; 2025-08-27                   ### #
+# ### Ref 2.0; 2026-10-08                   ### #
 #################################################
 #
 record(stringin, "$(MOT):model") {
@@ -33,162 +33,128 @@ record(ao, "$(MOT)_$(card)_$(axis):mres") {
         field(VAL, "$(MRES)")
         field(PINI, "YES")
 }
-#
-#       Generate Status
-#
-record(bo, "$(MOT)_$(card)_$(axis):ask_request") {
-        field(DESC, "Generate all requests")
-        field(FLNK, "$(MOT)_$(card)_$(axis):request")
-        field(PINI, "YES")
+record(stringout, "$(MOT)_$(card)_$(axis):egu") {
+	field(DESC, "Unity")
+	field(VAL, "$(EGU)")
+	field(PINI, "YES")
 }
-record(fanout, "$(MOT)_$(card)_$(axis):request") {
-        field(DESC, "All requesting Status")
-        field(SELM, "All")
-        field(LNK0, "$(MOT)_$(card)_$(axis):reqstatus")
-        field(LNK1, "$(MOT)_$(card)_$(axis):reqmoving")
-        field(LNK2, "$(MOT)_$(card)_$(axis):reqpos")
+record(ao, "$(MOT)_$(card)_$(axis):polarity") {
+	field(DESC, "Motor Direction")
+	field(VAL, "$(direct)")
+	field(PINI, "YES")
 }
-#
-#        Status Motor On/Off
-#
-record(bo, "$(MOT)_$(card)_$(axis):reqstatus") {
-        field(DESC, "Request Status $(card)_$(axis)")
-        field(FLNK, "$(MOT)_$(card)_$(axis):evalstatus")
-        field(ZNAM, "0")  # Label for state 0
-        field(ONAM, "1")  # Label for state 1
-        field(PINI, "YES")
-}
-record(stringin, "$(MOT)_$(card)_$(axis):ori_status") {
-        field(DESC, "Get Status $(card)_$(axis)")
-        field(SCAN, "Passive")
-        field(DTYP, "stream")
-        field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
-        field(PINI, "NO")
-        field(FLNK, "$(MOT)_$(card)_$(axis):status")
-}
-record(stringin, "$(MOT)_$(card)_$(axis):term_status") {
-        field(DESC, "Terminator for Motor Status")
-        field(VAL, "$(onoff)")
-        field(PINI, "YES")
-}
-record(scalcout, "$(MOT)_$(card)_$(axis):status") {
-        field(DESC, "Extract Info On/Off")
-        field(INAA, "$(MOT)_$(card)_$(axis):ori_status")
-        field(INBB, "$(MOT)_$(card)_$(axis):term_status")
-        field(CALC, "AA=BB?1:0")
-}
-record(seq, "$(MOT)_$(card)_$(axis):evalstatus") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "1")
-        field(LNK1, "$(MOT)_$(card)_$(axis):ori_status.PROC")
+record(bo, "$(MOT)_$(card)_$(axis):stop") {
+	field(DESC, "Emergency Stop")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(OUT, "@piIOC.proto setStop($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
 }
 #
 #       ON/OFF Motor
 #
 record(bo, "$(MOT)_$(card)_$(axis):reqmotor") {
-        field(DESC, "Request On/Off Motor $(card)_$(axis)")
-        field(FLNK, "$(MOT)_$(card)_$(axis):evalmotor")
-        field(ZNAM, "0")  # Label for state 0
-        field(ONAM, "1")  # Label for state 1
+	field(DESC, "Request On/Off Motor $(card)_$(axis)")
+	field(ZNAM, "0")  # Label for state 0
+	field(ONAM, "1")  # Label for state 1
 }
 record(bo, "$(MOT)_$(card)_$(axis):motor") {
-        field(DESC, "On/Off Motor $(card)_$(axis)")
-        field(SCAN, "Passive")
-        field(DTYP, "stream")
-        field(ZNAM, "0")  # Label for state 0
-        field(ONAM, "1")  # Label for state 1
-        field(OUT, "@piIOC.proto setStatus($(card),$(axis)) $(ASYNPORT)")
-        field(PINI, "NO")
+	field(DESC, "On/Off Motor $(card)_$(axis)")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(OUT, "@piIOC.proto setStatus($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
 }
-record(seq, "$(MOT)_$(card)_$(axis):evalmotor") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "$(MOT)_$(card)_$(axis):reqmotor.VAL")
-        field(LNK1, "$(MOT)_$(card)_$(axis):motor")
-        field(DO2, "1")
-        field(LNK2, "$(MOT)_$(card)_$(axis):motor.PROC")
-        field(DLY2, "0.5")
-        field(DO3, "1")
-        field(LNK3, "$(MOT)_$(card)_$(axis):err")
-        field(DLY4, "0.5")
-        field(DO4, "1")
-        field(LNK4, "$(MOT)_$(card)_$(axis):ask_request.PROC")
+record(ai, "$(MOT)_$(card)_$(axis):motor_status") {
+	field(DESC, "Motor On?")
+	field(PINI, "NO")
 }
 #
-#       Status Moving
+#	Status
 #
-record(bo, "$(MOT)_$(card)_$(axis):reqmoving") {
-        field(DESC, "Request Status Moving $(card)_$(axis)")
-        field(FLNK, "$(MOT)_$(card)_$(axis):evalmoving")
-        field(ZNAM, "0")  # Label for state 0
-        field(ONAM, "1")  # Label for state 1
+record(ai, "$(MOT)_$(card)_$(axis):status_mode") {
+	field(DESC, "SNL status IOC")
+	field(VAL, "0")
+	field(PINI, "YES")
 }
-record(stringin, "$(MOT)_$(card)_$(axis):ori_moving") {
-        field(DESC, "Get Status Moving $(card)_$(axis)")
-        field(SCAN, "Passive")
-        field(DTYP, "stream")
+record(bo, "$(MOT)_$(card)_$(axis):ask_request") {
+	field(DESC, "Request Infos from IOC")
+	field(SCAN, "Passive")
+	field(VAL, "1")
+	field(PINI, "YES")
+	field(OUT, "$(MOT)_$(card)_$(axis):status_mode.VAL PP")
+}
+#
+#record(ai, "$(MOT)_$(card)_$(axis):ms_status") {
+record(stringin, "$(MOT)_$(card)_$(axis):ms_status") {
+	field(DESC, "Status Motor")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+#	field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
         field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
-        field(PINI, "NO")
-        field(FLNK, "$(MOT)_$(card)_$(axis):moving")
+	field(PINI, "NO") 
 }
-record(stringin, "$(MOT)_$(card)_$(axis):term_moving") {
-        field(DESC, "Terminator for Motor Moving")
-        field(VAL, "$(ready)")
-        field(PINI, "YES")
+record(ai, "$(MOT)_$(card)_$(axis):ms_status_opt") {
+#record(stringin, "$(MOT)_$(card)_$(axis):ms_status_opt") {
+	field(DESC, "Status Motor Supplementary")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
+#        field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
 }
-record(scalcout, "$(MOT)_$(card)_$(axis):moving") {
-        field(DESC, "Extract Moving")
-        field(INAA, "$(MOT)_$(card)_$(axis):ori_moving")
-        field(INBB, "$(MOT)_$(card)_$(axis):term_moving")
-        field(CALC, "AA=BB?1:0")
+#record(stringin, "$(MOT)_$(card)_$(axis):lim_status") {
+#	field(DESC, "Status Limit Switch")
+#	field(SCAN, "Passive")
+#	field(DTYP, "stream")
+#        field(INP, "@piIOC.proto getLim($(card),$(axis)) $(ASYNPORT)")
+#	field(PINI, "NO")
+#}
+# Limits
+record(bi, "$(MOT)_$(card)_$(axis):limit_right") {
+	field(DESC, "Right (+) travel limit")
+	field(ZNAM, "Not tripped")
+	field(ONAM, "TRIPPED!!")
+	field(ZSV, "NO_ALARM")      # Severità quando il bit è 0 (non trippato)
+	field(OSV, "MAJOR")         # Severità quando il bit è 1 (trippato)
 }
-record(seq, "$(MOT)_$(card)_$(axis):evalmoving") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "1")
-        field(LNK1, "$(MOT)_$(card)_$(axis):ori_moving.PROC")
+record(bi, "$(MOT)_$(card)_$(axis):limit_left") {
+	field(DESC, "Left (-) travel limit")
+	field(ZNAM, "Not tripped")
+	field(ONAM, "TRIPPED!!")
+	field(ZSV, "NO_ALARM")      # Severità quando il bit è 0 (non trippato)
+	field(OSV, "MAJOR")         # Severità quando il bit è 1 (trippato)
 }
-#
-#	Position
-#
+# Moving
+record(bi,  "$(MOT)_$(card)_$(axis):moving") {
+	field(DESC, "Motor is moving?")
+	field(ZNAM, "Ready")
+	field(ONAM, "Moving")
+}
+# Position
 record(bo, "$(MOT)_$(card)_$(axis):reqpos") {
-	field(DESC, "Request Position $(card)_$(axis)")
-	field(FLNK, "$(MOT)_$(card)_$(axis):evalpos")	
-        field(PINI, "YES")
+	field(DESC, "Request Position")
 }
-record(ai, "$(MOT)_$(card)_$(axis):pos_mres") {
-        field(DESC, "Get Raw Position $(card)_$(axis)")
-        field(SCAN, "Passive")
-        field(DTYP, "stream")
-        field(INP, "@piIOC.proto getPos($(card),$(axis)) $(ASYNPORT)")
-        field(PINI, "NO")
+record(ai, "$(MOT)_$(card)_$(axis):act_pos") {
+	field(DESC, "Machine Position")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(INP, "@piIOC.proto getPos($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
 }
-record(calcout, "$(MOT)_$(card)_$(axis):pos") {
-        field(DESC, "Get Position $(card)_$(axis)")
-        field(EGU, "$(EGU)")
-        field(INPA, "$(MOT)_$(card)_$(axis):pos_mres CP")
-        field(INPB, "$(MOT)_$(card)_$(axis):mres")
-        field(INPC, "$(direct)")
-        field(CALC, "C*A/B")
-        field(PREC, "3")
-}
-record(seq, "$(MOT)_$(card)_$(axis):evalpos") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "1")
-        field(LNK1, "$(MOT)_$(card)_$(axis):pos_mres.PROC PP")
-        field(DOL2, "1")
-        field(LNK2, "$(MOT)_$(card)_$(axis):pos.PROC PP")
+record(ai, "$(MOT)_$(card)_$(axis):pos") {
+	field(DESC, "Actual Position")
+	field(SCAN, "Passive")
+	field(PINI, "NO")
 }
 #
 #       Homing
 #
 record(bo, "$(MOT)_$(card)_$(axis):reqhome") {
         field(DESC, "Request Homing $(card)_$(axis)")
-        field(FLNK, "$(MOT)_$(card)_$(axis):evalhome")
         field(ZNAM, "0")  # Label for state 0
         field(ONAM, "1")  # Label for state 1
+	field(PINI, "NO")
 }
 record(ai, "$(MOT)_$(card)_$(axis):home") {
         field(DESC, "Homing $(card)_$(axis)")
@@ -197,61 +163,25 @@ record(ai, "$(MOT)_$(card)_$(axis):home") {
         field(INP, "@piIOC.proto setHoming($(card),$(axis),$(homing)) $(ASYNPORT)")
         field(PINI, "NO")
 }
-record(seq, "$(MOT)_$(card)_$(axis):evalhome") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "1")
-        field(LNK1, "$(MOT)_$(card)_$(axis):home.PROC")
-}
 #
 #	MOVE ABSOLUTE
 #
 record(ao, "$(MOT)_$(card)_$(axis):setma") {
 	field(DESC, "Set Move Absolute $(card)_$(axis)")
-	field(FLNK, "$(MOT)_$(card)_$(axis):evalma")
 	field(PINI, "NO")
 }
 record(ao, "$(MOT)_$(card)_$(axis):ma") {
-	field(DESC, "Move Raw Absolute $(card)_$(axis)")
+	field(DESC, "Move Absolute $(card)_$(axis)")
 	field(SCAN, "Passive")
         field(DTYP, "stream")
         field(OUT, "@piIOC.proto setMovAbs($(card),$(axis)) $(ASYNPORT)")
         field(PINI, "NO")
-}
-record(calcout, "$(MOT)_$(card)_$(axis):ma_mres") {
-        field(DESC, "Move Raw Absolute $(card)_$(axis)")
-        field(EGU, "$(EGU)")
-        field(INPA, "$(MOT)_$(card)_$(axis):setma CP")
-        field(INPB, "$(MOT)_$(card)_$(axis):mres")
-        field(INPC, "$(direct)")
-        field(CALC, "A*B*C")
-        field(PREC, "3")
-}
-record(seq,"$(MOT)_$(card)_$(axis):evalma") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "$(MOT)_$(card)_$(axis):setma.VAL")
-        field(LNK1, "$(MOT)_$(card)_$(axis):ma_mres")
-        field(DO2, "1")
-        field(DLY2, "0.5")
-        field(LNK2, "$(MOT)_$(card)_$(axis):ma_mres.PROC")
-        field(DLY3, "0.5")
-        field(DOL3, "$(MOT)_$(card)_$(axis):ma_mres.VAL")
-        field(LNK3, "$(MOT)_$(card)_$(axis):ma")
-        field(DO4, "1")
-        field(LNK4, "$(MOT)_$(card)_$(axis):ma.PROC")
-        field(DO5, "1")
-        field(LNK5, "$(MOT)_$(card)_$(axis):err")
-        field(DLY6, "0.5")
-        field(DO6, "1")
-        field(LNK6, "$(MOT)_$(card)_$(axis):ask_request.PROC")
 }
 #
 #       MOVE RELATIVE
 #
 record(ao, "$(MOT)_$(card)_$(axis):setmr") {
         field(DESC, "Set Move Relative $(card)_$(axis)")
-        field(FLNK, "$(MOT)_$(card)_$(axis):evalmr")
         field(PINI, "NO")
 }
 record(ao, "$(MOT)_$(card)_$(axis):mr") {
@@ -261,46 +191,32 @@ record(ao, "$(MOT)_$(card)_$(axis):mr") {
         field(OUT, "@piIOC.proto setMovRel($(card),$(axis)) $(ASYNPORT)")
         field(PINI, "NO")
 }
-record(calcout, "$(MOT)_$(card)_$(axis):mr_mres") {
-        field(DESC, "Move Raw Relative $(card)_$(axis)")
-        field(EGU, "$(EGU)")
-        field(INPA, "$(MOT)_$(card)_$(axis):setmr CP")
-        field(INPB, "$(MOT)_$(card)_$(axis):mres")
-        field(INPC, "$(direct)")
-        field(CALC, "A*B*C")
-        field(PREC, "3")
+#
+#	Veocity
+#
+record(ao, "$(MOT)_$(card)_$(axis):setve") {
+	field(DESC, "Set Velocity $(card)_$(axis)")
+	field(PINI, "NO")
 }
-record(seq,"$(MOT)_$(card)_$(axis):evalmr") {
-        field(DO0, "1")
-        field(LNK0, "$(MOT)_$(card)_$(axis):err")
-        field(DOL1, "$(MOT)_$(card)_$(axis):setmr.VAL")
-        field(LNK1, "$(MOT)_$(card)_$(axis):mr_mres")
-        field(DO2, "1")
-        field(DLY2, "0.5")
-        field(LNK2, "$(MOT)_$(card)_$(axis):mr_mres.PROC")
-        field(DLY3, "0.5")
-        field(DOL3, "$(MOT)_$(card)_$(axis):mr_mres.VAL")
-        field(LNK3, "$(MOT)_$(card)_$(axis):mr")
-        field(DO4, "1")
-        field(LNK4, "$(MOT)_$(card)_$(axis):mr.PROC")
-        field(DO5, "1")
-        field(LNK5, "$(MOT)_$(card)_$(axis):err")
-        field(DLY6, "0.5")
-        field(DO6, "1")
-        field(LNK6, "$(MOT)_$(card)_$(axis):ask_request.PROC")
+record(ao, "$(MOT)_$(card)_$(axis):vel") {
+	field(DESC, "Velocity $(card)_$(axis)")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(OUT, "@piIOC.proto setVel($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+record(bo, "$(MOT)_$(card)_$(axis):reqvel") {
+	field(DESC, "Request Velocity")
+}
+record(ai, "$(MOT)_$(card)_$(axis):act_vel") {
+	field(DESC, "Machine Velocity")
+	field(SCAN, "Passive")
+	field(DTYP, "stream")
+	field(INP, "@piIOC.proto getVel($(card),$(axis)) $(ASYNPORT)")
+	field(PINI, "NO")
+}
+record(ai, "$(MOT)_$(card)_$(axis):real_vel") {
+	field(DESC, "Actual Velocity")
+	field(SCAN, "Passive")
+	field(PINI, "NO")
+}

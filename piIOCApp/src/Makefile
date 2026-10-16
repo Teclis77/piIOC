@@ -42,6 +42,16 @@ piIOC_SRCS_vxWorks += -nil-
 # Add support from base/src/vxWorks if needed
 #piIOC_OBJS_vxWorks += $(EPICS_BASE_BIN)/vxComLibrary
 
+ifneq ($(SNCSEQ),)
+	piIOC_SNCFLAGS += +r
+	piIOC_DBD += sncpi.dbd
+	piIOC_SRCS += status.stt
+	piIOC_SRCS += action.stt
+	piIOC_SRCS += motor_status.c
+	piIOC_SRCS += res_utils.c
+	piIOC_LIBS += seq pv
+endif
+
 ifdef EPICS_QSRV_MAJOR_VERSION
     piIOC_LIBS += qsrv
     piIOC_LIBS += $(EPICS_BASE_PVA_CORE_LIBS)

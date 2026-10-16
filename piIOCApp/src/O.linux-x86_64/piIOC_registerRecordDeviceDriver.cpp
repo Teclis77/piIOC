@@ -343,7 +343,8 @@ static struct jlif *jlifsl[] = {
 typedef void (*reg_func)(void);
 epicsShareExtern reg_func pvar_func_AsynDriverInterfaceRegistrar,
     pvar_func_QSRVRegistrar, pvar_func_aCalcMonitorMemRegister,
-    pvar_func_acalcTotalAllocatedMemoryRegister, pvar_func_arrInitialize,
+    pvar_func_acalcTotalAllocatedMemoryRegister,
+    pvar_func_actionpiRegistrar, pvar_func_arrInitialize,
     pvar_func_arrayTestRegister, pvar_func_asSub,
     pvar_func_asynInterposeDelayRegister,
     pvar_func_asynInterposeEchoRegister,
@@ -355,9 +356,10 @@ epicsShareExtern reg_func pvar_func_AsynDriverInterfaceRegistrar,
     pvar_func_editSseqRegistrar, pvar_func_installPVAAddLinkHook,
     pvar_func_interpRegister, pvar_func_refTrackRegistrar,
     pvar_func_registerStartPVAServer, pvar_func_rsrvRegistrar,
-    pvar_func_streamRegistrar, pvar_func_subAveRegister,
-    pvar_func_syncInitialize, pvar_func_tsInitialize,
-    pvar_func_utagInitialize, pvar_func_register_func_QSRV_image_demo;
+    pvar_func_statuspiRegistrar, pvar_func_streamRegistrar,
+    pvar_func_subAveRegister, pvar_func_syncInitialize,
+    pvar_func_tsInitialize, pvar_func_utagInitialize,
+    pvar_func_register_func_QSRV_image_demo;
 
 epicsShareExtern int * const pvar_int_CASDEBUG;
 epicsShareExtern int * const pvar_int_PDBProviderDebug;
@@ -465,7 +467,7 @@ static struct iocshVarDef vardefs[] = {
 int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
 {
     static int executed = 0;
-    const char *bldTop = "/home/xlabsrv2/epics/IOCs/piIOC";
+    const char *bldTop = "/home/xlabsrv11/epics/IOCs/piIOC";
     const char *envTop = getenv("TOP");
 
     if (envTop && strcmp(envTop, bldTop)) {
@@ -492,6 +494,7 @@ int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
     runRegistrarOnce(pvar_func_QSRVRegistrar);
     runRegistrarOnce(pvar_func_aCalcMonitorMemRegister);
     runRegistrarOnce(pvar_func_acalcTotalAllocatedMemoryRegister);
+    runRegistrarOnce(pvar_func_actionpiRegistrar);
     runRegistrarOnce(pvar_func_arrInitialize);
     runRegistrarOnce(pvar_func_arrayTestRegister);
     runRegistrarOnce(pvar_func_asSub);
@@ -510,6 +513,7 @@ int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
     runRegistrarOnce(pvar_func_refTrackRegistrar);
     runRegistrarOnce(pvar_func_registerStartPVAServer);
     runRegistrarOnce(pvar_func_rsrvRegistrar);
+    runRegistrarOnce(pvar_func_statuspiRegistrar);
     runRegistrarOnce(pvar_func_streamRegistrar);
     runRegistrarOnce(pvar_func_subAveRegister);
     runRegistrarOnce(pvar_func_syncInitialize);
