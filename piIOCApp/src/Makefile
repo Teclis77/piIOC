@@ -45,7 +45,7 @@ piIOC_SRCS_vxWorks += -nil-
 ifneq ($(SNCSEQ),)
 	piIOC_SNCFLAGS += +r
 	piIOC_DBD += sncpi.dbd
-#	piIOC_SRCS += status.stt
+	piIOC_SRCS += status.stt
 	piIOC_SRCS += action.stt
 	piIOC_SRCS += motor_status.c
 	piIOC_SRCS += res_utils.c

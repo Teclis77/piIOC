@@ -127,70 +127,82 @@ ss motor_snl {
 		} state idle
 	}
 //
-	state check_status {
-		when () {
-			ms_status_proc = 1;
-			pvPut(ms_status_proc, SYNC);
-			epicsThreadSleep(0.1);
-//
-			pvGet(ms_status, SYNC);
-//
-// Parsing SVO?
-			if (parse_svo(ms_status, &g_motor_status) != 0) {
-				printf("ERRORE: parsing SVO? fallito (risposta: '%s')\n", ms_status);
-			} else {
-				printf("SVO? = '%s' -> motor_on = %d\n", ms_status, g_motor_status.motor_on);
-			}
-// 0 = spento, 1 = acceso
-			motor_status = g_motor_status.motor_on;
-			pvPut(motor_status, SYNC);
-//
-			if (g_motor_status.motor_on == 0) {
-				printf("ERRORE: motore spento! (SVO? = 0)\n");
-			}
-			status_mode = 2;
-			pvPut(status_mode, SYNC);
-		} state check_err
-	}
-// motor_status_opt_char
-	state check_status_opt {
-		when() {
-			ms_status_opt_proc = 1;
-			pvPut(ms_status_opt_proc,SYNC);
-			epicsThreadSleep(0.1);
-//
-			pvGet(ms_status_opt,SYNC);
-			motor_status_opt_char = ms_status_opt[0];
-//
-			parse_total_status(motor_status_opt_char, &g_motor_status_opt);
-//
-//			if (lc_axis == "1") {
-			if (strcmp(lc_axis, "1") == 0) {
-				mot_moving = g_motor_status_opt.axis1_moving;
-			} else if (strcmp(lc_axis, "2") == 0) {
-				mot_moving = g_motor_status_opt.axis2_moving;
-			} else if (strcmp(lc_axis, "3") == 0) {
-				mot_moving = g_motor_status_opt.axis3_moving;
-			} else {
-				mot_moving = g_motor_status_opt.axis4_moving;
-			}
-//			pvPut(mot_moving,SYNC);
-			printf("Is It Moving axis %s? = %d\n", lc_axis,mot_moving);
+state check_status {
+	when () {
+		int ms_raw_int;
 
-			if (mot_moving == 0) {
-				b_moving = 0;
-			} else {
-				b_moving = 1;
-			}
+		ms_status_proc = 1;
+		pvPut(ms_status_proc, SYNC);
+		epicsThreadSleep(0.1);
 
-			pvPut(b_moving,SYNC);
-//
-			/* Oppure debug rapido */
-			print_total_status(motor_status_opt_char);
-			status_mode=3;
-			pvPut(status_mode,SYNC);
-		} state check_err
-	}
+		pvGet(ms_status, SYNC);
+		/* ms_status contiene "0 2 1 1=0x900A" */
+		/* parse_motor_status_from_string estrae il valore hex */
+		parse_motor_status_from_string(ms_status, &g_motor_status);
+		ms_raw_int = (int)g_motor_status.raw;
+
+		if (!g_motor_status.power_on) {
+			printf("ERRORE: motore spento!\n");
+		}
+		if (g_motor_status.limit_right || g_motor_status.limit_left) {
+			printf("ATTENZIONE: limite scattato!\n");
+		}
+		if (g_motor_status.in_motion) {
+			printf("Motore in movimento\n");
+		}
+		if (g_motor_status.error) {
+			printf("ERRORE PENDENTE sul controller!\n");
+		}
+		printf("%d,%d,%d,%d\n",
+				g_motor_status.power_on,
+				g_motor_status.limit_right,
+				g_motor_status.limit_left,
+				g_motor_status.in_motion);
+
+		motor_status = g_motor_status.power_on;
+		pvPut(motor_status, SYNC);
+		lim_pos = g_motor_status.limit_right;
+		pvPut(lim_pos, SYNC);
+		lim_neg = g_motor_status.limit_left;
+		pvPut(lim_neg, SYNC);
+
+		sprintf(motor_name, "Motor%s", lc_axis);
+		print_motor_status(motor_name, ms_raw_int);
+
+		status_mode = 2;
+		pvPut(status_mode, SYNC);
+	} state check_err
+}
+
+state check_status_opt {
+	when() {
+		int svo_raw_int;
+
+		ms_status_opt_proc = 1;
+		pvPut(ms_status_opt_proc, SYNC);
+		epicsThreadSleep(0.1);
+
+		pvGet(ms_status_opt, SYNC);
+		/* ms_status_opt contiene "0" o "1" per SVO? */
+		svo_raw_int = atoi(ms_status_opt);
+
+		parse_total_status(svo_raw_int, &g_motor_status_opt);
+
+		/* Per C663 in_motion viene da SRG? (check_status),
+		 * non da SVO? - usiamo g_motor_status.in_motion */
+		mot_moving = g_motor_status.in_motion;
+
+		printf("Is It Moving axis %s? = %d\n", lc_axis, mot_moving);
+
+		b_moving = (mot_moving != 0) ? 1 : 0;
+		pvPut(b_moving, SYNC);
+
+		print_total_status(svo_raw_int);
+
+		status_mode = 3;
+		pvPut(status_mode, SYNC);
+	} state check_err
+}
 	state check_position {
 		when() {
 			pvPut(act_pos,SYNC);

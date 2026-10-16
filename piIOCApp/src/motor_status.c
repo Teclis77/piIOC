@@ -1,12 +1,24 @@
 //###############################################
-//# ###                                       ### #
-//# ### PI Mercury C-663 Status Parser        ### #
-//# ### (single axis)                         ### #
-//# ###                                       ### #
-//# ### author: D. Hampai - M. Montis         ### #
-//# ###                                       ### #
-//# ### Ref 3.0; 2026-10-09                   ### #
+//# ###                                     ### #
+//# ### PI Mercury C-663 Status Parser      ### #
+//# ### (single axis)                       ### #
+//# ###                                     ### #
+//# ### author: D. Hampai - M. Montis       ### #
+//# ###                                     ### #
+//# ### Ref 2.0; 2026-10-09                 ### #
 //###############################################
+
+/*
+ *
+ * Interpretazione dei registri di status del controller PI Mercury C-663.
+ * Interfaccia IDENTICA a motor_status.c (mm4006) per permettere
+ * la generalizzazione dei file SNL.
+ *
+ * Formato risposta SRG?:
+ *   "0 2 1 1=0x900A"
+ *   Il valore esadecimale e' dopo il carattere '='
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,125 +26,307 @@
 #include <ctype.h>
 #include "motor_status.h"
 
-// ---------------------------------------------------------------
-// extract_srg_value
-//   Cerca "0x" (o "0X") nella stringa e parsa l'esadecimale.
-//   Se non lo trova, tenta di parsare l'ultimo token esadecimale.
-//   Ritorna il valore a 16 bit, oppure 0 in caso di errore.
-// ---------------------------------------------------------------
-static unsigned int extract_srg_value(const char *resp)
+/* ════════════════════════════════════════════════
+ *  Funzione interna: stampa valore a 16 bit in binario
+ * ════════════════════════════════════════════════ */
+static void print_binary_16(unsigned int value)
 {
-    const char *p;
-    unsigned int val = 0;
-
-    if (!resp || *resp == '\0')
-        return 0;
-
-    // Caso 1: "0x..." (formato atteso dal C-663)
-    p = strstr(resp, "0x");
-    if (!p) p = strstr(resp, "0X");
-
-    if (p) {
-        val = (unsigned int)strtoul(p, NULL, 16);
-        return val;
+    int bit;
+    for (bit = 15; bit >= 0; bit--) {
+        printf("%d", (value >> bit) & 1);
+        if (bit == 8) printf(" ");
     }
-
-    // Caso 2: stringa senza prefisso "0x"
-    //   Cerca l'ultimo token esadecimale valido
-    {
-        const char *last_start = NULL;
-        const char *q = resp;
-        const char *tok_start = NULL;
-        size_t tok_len = 0;
-
-        while (*q) {
-            if (isxdigit((unsigned char)*q)) {
-                if (tok_start == NULL)
-                    tok_start = q;
-                tok_len = (size_t)(q - tok_start) + 1;
-            } else {
-                if (tok_start != NULL && tok_len > 0) {
-                    last_start = tok_start;
-                }
-                tok_start = NULL;
-                tok_len = 0;
-            }
-            q++;
-        }
-        if (tok_start != NULL && tok_len > 0) {
-            last_start = tok_start;
-        }
-
-        if (last_start) {
-            char buf[32];
-            size_t n = 0;
-            while (last_start[n] && isxdigit((unsigned char)last_start[n])
-                   && n < sizeof(buf) - 1) {
-                buf[n] = last_start[n];
-                n++;
-            }
-            buf[n] = '\0';
-            val = (unsigned int)strtoul(buf, NULL, 16);
-        }
-    }
-
-    return val;
 }
 
-// ---------------------------------------------------------------
-// parse_motor_status
-//   Popola la struct MotorStatus a partire dalla risposta SRG?.
-//   Ritorna 0 se ok, -1 se la stringa è vuota/null.
-// ---------------------------------------------------------------
-int parse_motor_status(const char *resp, MotorStatus *st)
+/* ════════════════════════════════════════════════
+ *  Funzione interna: estrae il valore hex dalla stringa SRG?
+ *
+ *  Formato atteso: "0 2 1 1=0x900A"
+ *  Cerca il carattere '=' e converte la parte destra in unsigned int.
+ *  Supporta sia "0x900A" che "900A" (con o senza prefisso 0x).
+ *
+ *  Ritorna: valore unsigned int, oppure 0xFFFFFFFF in caso di errore.
+ * ════════════════════════════════════════════════ */
+static unsigned int extract_srg_hex(const char *srg_str)
 {
-    unsigned int val;
+    const char *eq_ptr;
+    const char *hex_ptr;
+    char *endptr;
+    unsigned int value;
 
-    if (!st)
+    if (srg_str == NULL || srg_str[0] == '\0') {
+        printf("WARN extract_srg_hex: stringa vuota o NULL\n");
+        return 0xFFFFFFFF;
+    }
+
+    /* Cerca il carattere '=' nella stringa */
+    eq_ptr = strchr(srg_str, '=');
+    if (eq_ptr == NULL) {
+        printf("ERROR extract_srg_hex: "
+               "carattere '=' non trovato in '%s'\n", srg_str);
+        return 0xFFFFFFFF;
+    }
+
+    /* Punta al carattere dopo '=' */
+    hex_ptr = eq_ptr + 1;
+
+    /* Salta eventuali spazi */
+    while (*hex_ptr == ' ') hex_ptr++;
+
+    /* Converte la stringa hex in unsigned int
+     * strtoul con base 16 gestisce sia "0x900A" che "900A" */
+    if (strncmp(hex_ptr, "0x", 2) == 0 ||
+        strncmp(hex_ptr, "0X", 2) == 0) {
+        value = (unsigned int)strtoul(hex_ptr, &endptr, 16);
+    } else {
+        value = (unsigned int)strtoul(hex_ptr, &endptr, 16);
+    }
+
+    if (endptr == hex_ptr) {
+        printf("ERROR extract_srg_hex: "
+               "valore hex non valido: '%s'\n", hex_ptr);
+        return 0xFFFFFFFF;
+    }
+
+    printf("DEBUG extract_srg_hex: "
+           "'%s' -> 0x%04X (%u)\n", srg_str, value, value);
+
+    return value;
+}
+
+/* ════════════════════════════════════════════════
+ *  SRG?  —  parse_motor_status()
+ *
+ *  Accetta il valore raw come int (gia' convertito).
+ *  Per parsing dalla stringa usa parse_motor_status_from_string().
+ * ════════════════════════════════════════════════ */
+int parse_motor_status(int srg_value, MotorStatus *ms)
+{
+    unsigned int v;
+
+    if (ms == NULL) return -1;
+    if (srg_value < 0) {
+        printf("WARN parse_motor_status: valore negativo ignorato\n");
         return -1;
+    }
 
-    memset(st, 0, sizeof(*st));
+    v = (unsigned int)srg_value;
+    ms->raw = v;
 
-    if (!resp || *resp == '\0')
-        return -1;
-
-    val = extract_srg_value(resp);
-
-    st->limit_left     = (val & 0x0001u) ? 1 : 0;  // bit 0  : negative limit
-    st->ref_switch     = (val & 0x0002u) ? 1 : 0;  // bit 1  : ref switch
-    st->limit_right    = (val & 0x0004u) ? 1 : 0;  // bit 2  : positive limit
-    st->referenced     = (val & 0x0008u) ? 1 : 0;  // bit 3  : referenced
-    st->error_flag     = (val & 0x0100u) ? 1 : 0;  // bit 8  : error pending
-    st->power_on       = (val & 0x1000u) ? 1 : 0;  // bit 12 : motor on
-    st->in_motion      = (val & 0x2000u) ? 1 : 0;  // bit 13 : in motion
-    st->is_referencing = (val & 0x4000u) ? 1 : 0;  // bit 14 : is referencing
-    st->on_target      = (val & 0x8000u) ? 1 : 0;  // bit 15 : on target
+    /* Bit 13: in movimento */
+    ms->in_motion      = (v & SRG_BIT_IN_MOTION)      ? 1 : 0;
+    /* Bit 12: motore acceso */
+    ms->power_on       = (v & SRG_BIT_MOTOR_ON)        ? 1 : 0;
+    /* dir_positive: non disponibile su C663 */
+    ms->dir_positive   = 0;
+    /* Bit 2: limit positivo (+) */
+    ms->limit_right    = (v & SRG_BIT_LIMIT_POS)       ? 1 : 0;
+    /* Bit 0: limit negativo (-) */
+    ms->limit_left     = (v & SRG_BIT_LIMIT_NEG)       ? 1 : 0;
+    /* Bit 3: referenziato (mech_zero per compatibilita') */
+    ms->mech_zero      = (v & SRG_BIT_REFERENCED)      ? 1 : 0;
+    /* Campi aggiuntivi C663 */
+    ms->error          = (v & SRG_BIT_ERROR)           ? 1 : 0;
+    ms->on_target      = (v & SRG_BIT_ON_TARGET)       ? 1 : 0;
+    ms->is_referencing = (v & SRG_BIT_IS_REFERENCING)  ? 1 : 0;
+    ms->ref_switch     = (v & SRG_BIT_REF_SWITCH)      ? 1 : 0;
+    ms->dig_in[0]      = (v & SRG_BIT_DIG_IN1)         ? 1 : 0;
+    ms->dig_in[1]      = (v & SRG_BIT_DIG_IN2)         ? 1 : 0;
+    ms->dig_in[2]      = (v & SRG_BIT_DIG_IN3)         ? 1 : 0;
+    ms->dig_in[3]      = (v & SRG_BIT_DIG_IN4)         ? 1 : 0;
 
     return 0;
 }
 
-// ---------------------------------------------------------------
-// print_motor_status
-//   Debug helper: stampa lo stato del motore.
-// ---------------------------------------------------------------
-void print_motor_status(const char *name, MotorStatus *st)
+/* ── parse_motor_status_from_string() ──
+ *
+ * Questa e' la funzione principale da usare nello SNL.
+ * Accetta la stringa completa della risposta SRG?
+ * nel formato "0 2 1 1=0x900A" e la decodifica.
+ */
+int parse_motor_status_from_string(const char *srg_str, MotorStatus *ms)
 {
-    if (!name) name = "Motor";
-    if (!st) {
-        printf("[%s] (null MotorStatus)\n", name);
-        return;
+    unsigned int hex_value;
+
+    if (srg_str == NULL || ms == NULL) return -1;
+
+    hex_value = extract_srg_hex(srg_str);
+    if (hex_value == 0xFFFFFFFF) {
+        printf("ERROR parse_motor_status_from_string: "
+               "parsing fallito per '%s'\n", srg_str);
+        return -1;
     }
 
-    printf("[%s] power_on=%d lim_left=%d lim_right=%d in_motion=%d "
-           "referenced=%d error=%d on_target=%d is_ref=%d ref_sw=%d\n",
-           name,
-           st->power_on,
-           st->limit_left,
-           st->limit_right,
-           st->in_motion,
-           st->referenced,
-           st->error_flag,
-           st->on_target,
-           st->is_referencing,
-           st->ref_switch);
+    return parse_motor_status((int)hex_value, ms);
+}
+
+/* ── Accesso diretto ai bit SRG ── */
+
+int ms_is_in_motion(int srg_value)
+{
+    return ((unsigned int)srg_value & SRG_BIT_IN_MOTION)  ? 1 : 0;
+}
+
+int ms_is_power_on(int srg_value)
+{
+    return ((unsigned int)srg_value & SRG_BIT_MOTOR_ON)   ? 1 : 0;
+}
+
+int ms_is_limit_right(int srg_value)
+{
+    return ((unsigned int)srg_value & SRG_BIT_LIMIT_POS)  ? 1 : 0;
+}
+
+int ms_is_limit_left(int srg_value)
+{
+    return ((unsigned int)srg_value & SRG_BIT_LIMIT_NEG)  ? 1 : 0;
+}
+
+/* ── Controlli composti ── */
+
+int ms_status_ok(int srg_value)
+{
+    if (!ms_is_power_on(srg_value))    return 0;
+    if (ms_is_limit_right(srg_value))  return 0;
+    if (ms_is_limit_left(srg_value))   return 0;
+    if ((unsigned int)srg_value & SRG_BIT_ERROR) return 0;
+    return 1;
+}
+
+int ms_is_ready(int srg_value)
+{
+    if (!ms_is_power_on(srg_value))    return 0;
+    if (ms_is_in_motion(srg_value))    return 0;
+    if (ms_is_limit_right(srg_value))  return 0;
+    if (ms_is_limit_left(srg_value))   return 0;
+    if ((unsigned int)srg_value & SRG_BIT_ERROR) return 0;
+    return 1;
+}
+
+/* ── ms_to_epics() ── */
+
+void ms_to_epics(int srg_value,
+                 int *out_in_motion,
+                 int *out_power_on,
+                 int *out_limit_right,
+                 int *out_limit_left)
+{
+    if (out_in_motion)   *out_in_motion   = ms_is_in_motion(srg_value);
+    if (out_power_on)    *out_power_on    = ms_is_power_on(srg_value);
+    if (out_limit_right) *out_limit_right = ms_is_limit_right(srg_value);
+    if (out_limit_left)  *out_limit_left  = ms_is_limit_left(srg_value);
+}
+
+/* ── print_motor_status() ── */
+
+void print_motor_status(const char *label, int srg_value)
+{
+    MotorStatus ms;
+    unsigned int v = (unsigned int)srg_value;
+
+    parse_motor_status(srg_value, &ms);
+
+    printf("=== SRG Status: %s ===\n", label ? label : "?");
+    printf("  Risposta   : SRG? -> 0x%04X (%d)\n", v, srg_value);
+    printf("  Binario    : ");
+    print_binary_16(v);
+    printf("\n");
+    printf("               FEDC BA98 7654 3210\n");
+    printf("  ---\n");
+    printf("  Bit  0 - Limit NEG (-)   : %s\n",
+           ms.limit_left      ? "SCATTATO !!!"        : "Non scattato");
+    printf("  Bit  1 - Ref switch      : %s\n",
+           ms.ref_switch      ? "Non attivo"          : "Attivo");
+    printf("  Bit  2 - Limit POS (+)   : %s\n",
+           ms.limit_right     ? "SCATTATO !!!"        : "Non scattato");
+    printf("  Bit  3 - Referenziato    : %s\n",
+           ms.mech_zero       ? "SI"                  : "NO");
+    printf("  Bit 4-7 - Digital IN 1-4 : %d %d %d %d\n",
+           ms.dig_in[0], ms.dig_in[1],
+           ms.dig_in[2], ms.dig_in[3]);
+    printf("  Bit  8 - Error flag      : %s\n",
+           ms.error           ? "ERRORE PENDENTE !!!" : "Nessun errore");
+    printf("  Bit 12 - Motor ON        : %s\n",
+           ms.power_on        ? "SI (acceso)"         : "NO (spento)");
+    printf("  Bit 13 - In motion       : %s\n",
+           ms.in_motion       ? "SI - in movimento"   : "NO - fermo");
+    printf("  Bit 14 - Is referencing  : %s\n",
+           ms.is_referencing  ? "SI"                  : "NO");
+    printf("  Bit 15 - On target       : %s\n",
+           ms.on_target       ? "SI - posiz. ragg."   : "NO");
+    printf("  ---\n");
+    printf("  Status OK                : %s\n",
+           ms_status_ok(srg_value) ? "SI" : "NO");
+    printf("  Pronto a muoversi        : %s\n",
+           ms_is_ready(srg_value)  ? "SI" : "NO");
+    printf("========================\n");
+}
+
+/* ════════════════════════════════════════════════
+ *  SVO?  —  parse_total_status()
+ * ════════════════════════════════════════════════ */
+int parse_total_status(int svo_value, TotalStatus *ts)
+{
+    if (ts == NULL) return -1;
+
+    ts->raw      = svo_value;
+    ts->power_on = (svo_value != 0) ? 1 : 0;
+
+    /* SVO? e' globale: axis_moving non disponibile,
+     * usare SRG? per ogni singolo asse */
+    ts->axis1_moving = 0;
+    ts->axis2_moving = 0;
+    ts->axis3_moving = 0;
+    ts->axis4_moving = 0;
+    ts->srq          = 0;
+
+    return 0;
+}
+
+int ts_is_power_on(int svo_value)
+{
+    return (svo_value != 0) ? 1 : 0;
+}
+
+int ts_any_axis_moving(int svo_value)
+{
+    (void)svo_value;
+    return 0;
+}
+
+int ts_is_srq(int svo_value)
+{
+    (void)svo_value;
+    return 0;
+}
+
+void ts_to_epics(int svo_value,
+                 int *out_axis1_moving,
+                 int *out_axis2_moving,
+                 int *out_axis3_moving,
+                 int *out_axis4_moving,
+                 int *out_power_on,
+                 int *out_srq)
+{
+    if (out_axis1_moving) *out_axis1_moving = 0;
+    if (out_axis2_moving) *out_axis2_moving = 0;
+    if (out_axis3_moving) *out_axis3_moving = 0;
+    if (out_axis4_moving) *out_axis4_moving = 0;
+    if (out_power_on)     *out_power_on     = ts_is_power_on(svo_value);
+    if (out_srq)          *out_srq          = 0;
+}
+
+void print_total_status(int svo_value)
+{
+    TotalStatus ts;
+    parse_total_status(svo_value, &ts);
+
+    printf("=== SVO Status (Global) ===\n");
+    printf("  Risposta   : SVO? -> %d\n", svo_value);
+    printf("  ---\n");
+    printf("  Motor power  : %s\n",
+           ts.power_on ? "ON (acceso)" : "OFF (spento)");
+    printf("  Nota: in_motion non disponibile da SVO?,\n");
+    printf("        usare SRG? per ogni asse.\n");
+    printf("==========================\n");
 }

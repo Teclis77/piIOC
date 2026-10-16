@@ -85,27 +85,31 @@ record(bo, "$(MOT)_$(card)_$(axis):ask_request") {
 	field(OUT, "$(MOT)_$(card)_$(axis):status_mode.VAL PP")
 }
 #
-record(ai, "$(MOT)_$(card)_$(axis):ms_status") {
+#record(ai, "$(MOT)_$(card)_$(axis):ms_status") {
+record(stringin, "$(MOT)_$(card)_$(axis):ms_status") {
 	field(DESC, "Status Motor")
 	field(SCAN, "Passive")
 	field(DTYP, "stream")
-	field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
+#	field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
+        field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
 	field(PINI, "NO") 
 }
 record(ai, "$(MOT)_$(card)_$(axis):ms_status_opt") {
+#record(stringin, "$(MOT)_$(card)_$(axis):ms_status_opt") {
 	field(DESC, "Status Motor Supplementary")
 	field(SCAN, "Passive")
 	field(DTYP, "stream")
-        field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
+	field(INP, "@piIOC.proto getStatus($(card),$(axis)) $(ASYNPORT)")
+#        field(INP, "@piIOC.proto getMoving($(card),$(axis)) $(ASYNPORT)")
 	field(PINI, "NO")
 }
-record(stringin, "$(MOT)_$(card)_$(axis):lim_status") {
-	field(DESC, "Status Limit Switch")
-	field(SCAN, "Passive")
-	field(DTYP, "stream")
-        field(INP, "@piIOC.proto getLim($(card),$(axis)) $(ASYNPORT)")
-	field(PINI, "NO")
-}
+#record(stringin, "$(MOT)_$(card)_$(axis):lim_status") {
+#	field(DESC, "Status Limit Switch")
+#	field(SCAN, "Passive")
+#	field(DTYP, "stream")
+#        field(INP, "@piIOC.proto getLim($(card),$(axis)) $(ASYNPORT)")
+#	field(PINI, "NO")
+#}
 # Limits
 record(bi, "$(MOT)_$(card)_$(axis):limit_right") {
 	field(DESC, "Right (+) travel limit")

@@ -35,10 +35,15 @@ getError {
 #	in "%d %d %d";
 	in "%s %s %s";
 }
+#getMoving {
+#        out "\$1 ONT? \$2";
+#        in "%d %d %d=%d";
+##	in "%s %s %2c%s";
+#}
 getMoving {
-        out "\$1 ONT? \$2";
-        in "%d %d %d=%d";
-#	in "%s %s %2c%s";
+       out "\$1 SRG? \$2 1";
+#      in "%d %d %d %d=%s";
+       in "%#s";
 }
 getStatus {
 	out "\$1 SVO? \$2";
@@ -65,11 +70,11 @@ setHoming {
 setStop {
 	out "\$1 HLT \$2";
 }
-getLim {
-	out "\$1 SRG? \$2 1";
-#	in "%d %d %d %d=%s";
-	in "%#s";
-}
+#getLim {
+#	out "\$1 SRG? \$2 1";
+##	in "%d %d %d %d=%s";
+#	in "%#s";
+#}
 getVel {
 	out "\$1 VEL? \$2";
 	in "%d %d %d=%f";

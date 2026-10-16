@@ -356,9 +356,10 @@ epicsShareExtern reg_func pvar_func_AsynDriverInterfaceRegistrar,
     pvar_func_editSseqRegistrar, pvar_func_installPVAAddLinkHook,
     pvar_func_interpRegister, pvar_func_refTrackRegistrar,
     pvar_func_registerStartPVAServer, pvar_func_rsrvRegistrar,
-    pvar_func_streamRegistrar, pvar_func_subAveRegister,
-    pvar_func_syncInitialize, pvar_func_tsInitialize,
-    pvar_func_utagInitialize, pvar_func_register_func_QSRV_image_demo;
+    pvar_func_statuspiRegistrar, pvar_func_streamRegistrar,
+    pvar_func_subAveRegister, pvar_func_syncInitialize,
+    pvar_func_tsInitialize, pvar_func_utagInitialize,
+    pvar_func_register_func_QSRV_image_demo;
 
 epicsShareExtern int * const pvar_int_CASDEBUG;
 epicsShareExtern int * const pvar_int_PDBProviderDebug;
@@ -512,6 +513,7 @@ int piIOC_registerRecordDeviceDriver(DBBASE *pbase)
     runRegistrarOnce(pvar_func_refTrackRegistrar);
     runRegistrarOnce(pvar_func_registerStartPVAServer);
     runRegistrarOnce(pvar_func_rsrvRegistrar);
+    runRegistrarOnce(pvar_func_statuspiRegistrar);
     runRegistrarOnce(pvar_func_streamRegistrar);
     runRegistrarOnce(pvar_func_subAveRegister);
     runRegistrarOnce(pvar_func_syncInitialize);
