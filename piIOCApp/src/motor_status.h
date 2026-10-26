@@ -166,4 +166,14 @@ void ts_to_epics(int svo_value,
  */
 void print_total_status(int svo_value);
 
+
+/* ════════════════════════════════════════════════
+ *  Variabili globali - definite in motor_status.c
+ *  Rimuovere le definizioni da action.stt e status.stt
+ * ════════════════════════════════════════════════ */
+extern MotorStatus g_motor_status;
+extern char        g_motor_status_char;
+extern TotalStatus g_motor_status_opt;
+extern char        g_motor_status_opt_char;
+
 #endif // MOTOR_STATUS_H

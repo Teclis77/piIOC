@@ -23,13 +23,7 @@ program actionpi
 #include "motor_status.h"
 #include "res_utils.h"
 
-// Dichiarazione globale della variabile MotorStatus - temporaneamente disabilitata
-/*
-MotorStatus g_motor_status;
-char g_motor_status_char;
-TotalStatus g_motor_status_opt;
-char g_motor_status_opt_char;
-*/
+// Variabili globali definite in motor_status.c (extern in motor_status.h)
 }%
 //
 option +r;

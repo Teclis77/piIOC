@@ -27,6 +27,15 @@
 #include "motor_status.h"
 
 /* ════════════════════════════════════════════════
+ *  Variabili globali - definite qui, extern in motor_status.h
+ *  Condivise tra action.stt e status.stt
+ * ════════════════════════════════════════════════ */
+MotorStatus g_motor_status;
+char        g_motor_status_char;
+TotalStatus g_motor_status_opt;
+char        g_motor_status_opt_char;
+
+/* ════════════════════════════════════════════════
  *  Funzione interna: stampa valore a 16 bit in binario
  * ════════════════════════════════════════════════ */
 static void print_binary_16(unsigned int value)

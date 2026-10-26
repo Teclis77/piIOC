@@ -17,68 +17,62 @@
 #include "motor_status.h"
 #include "res_utils.h"
 
-// Dichiarazione globale della variabile MotorStatus - temporaneamente disabilitata
-/*
-MotorStatus g_motor_status;
-char g_motor_status_char;
-TotalStatus g_motor_status_opt;
-char g_motor_status_opt_char;
-*/
+// Variabili globali definite in motor_status.c (extern in motor_status.h)
 
 
 /* Variable declarations */
 struct seqg_vars {
-# line 53 "../action.stt"
+# line 47 "../action.stt"
 	string check_err_act;
-# line 54 "../action.stt"
+# line 48 "../action.stt"
 	float mres;
-# line 55 "../action.stt"
+# line 49 "../action.stt"
 	int polarity;
-# line 56 "../action.stt"
+# line 50 "../action.stt"
 	int reqmotor;
-# line 57 "../action.stt"
+# line 51 "../action.stt"
 	int motor;
-# line 58 "../action.stt"
+# line 52 "../action.stt"
 	int reqhome;
-# line 59 "../action.stt"
+# line 53 "../action.stt"
 	int home;
-# line 60 "../action.stt"
+# line 54 "../action.stt"
 	float setma;
-# line 61 "../action.stt"
+# line 55 "../action.stt"
 	float ma;
-# line 62 "../action.stt"
+# line 56 "../action.stt"
 	float setmr;
-# line 63 "../action.stt"
+# line 57 "../action.stt"
 	float mr;
-# line 64 "../action.stt"
+# line 58 "../action.stt"
 	float setvel;
-# line 65 "../action.stt"
+# line 59 "../action.stt"
 	float vel;
-# line 67 "../action.stt"
+# line 61 "../action.stt"
 	int status_controller;
-# line 68 "../action.stt"
+# line 62 "../action.stt"
 	int status_ma;
-# line 69 "../action.stt"
+# line 63 "../action.stt"
 	int status_mr;
-# line 70 "../action.stt"
+# line 64 "../action.stt"
 	int status_vel;
-# line 71 "../action.stt"
+# line 65 "../action.stt"
 	float ma_mres;
-# line 72 "../action.stt"
+# line 66 "../action.stt"
 	float mr_mres;
-# line 73 "../action.stt"
+# line 67 "../action.stt"
 	float setma_prev;
-# line 74 "../action.stt"
+# line 68 "../action.stt"
 	float setmr_prev;
-# line 75 "../action.stt"
+# line 69 "../action.stt"
 	float setvel_prev;
-# line 76 "../action.stt"
+# line 70 "../action.stt"
 	float vel_pol;
-# line 77 "../action.stt"
+# line 71 "../action.stt"
 	string lc_motor;
-# line 78 "../action.stt"
+# line 72 "../action.stt"
 	string lc_card;
-# line 79 "../action.stt"
+# line 73 "../action.stt"
 	string lc_axis;
 };
 
@@ -113,25 +107,25 @@ static void seqg_action_motor_action_0_init(SS_ID seqg_env, int seqg_trn, int *s
 	{
 	case 0:
 		{
-# line 84 "../action.stt"
+# line 78 "../action.stt"
 			strcpy(seqg_var->lc_motor, seq_macValueGet(seqg_env, "motor"));
-# line 85 "../action.stt"
+# line 79 "../action.stt"
 			strcpy(seqg_var->lc_card, seq_macValueGet(seqg_env, "card"));
-# line 86 "../action.stt"
+# line 80 "../action.stt"
 			strcpy(seqg_var->lc_axis, seq_macValueGet(seqg_env, "axis"));
-# line 87 "../action.stt"
+# line 81 "../action.stt"
 			printf("Action Init done\n");
-# line 88 "../action.stt"
+# line 82 "../action.stt"
 			seq_pvGetTmo(seqg_env, 1/*mres*/, SYNC, DEFAULT_TIMEOUT);
-# line 89 "../action.stt"
+# line 83 "../action.stt"
 			seq_pvGetTmo(seqg_env, 2/*polarity*/, SYNC, DEFAULT_TIMEOUT);
-# line 90 "../action.stt"
+# line 84 "../action.stt"
 			printf("Init Action-SNL for Motor %s_%s_%s\n", seqg_var->lc_motor, seqg_var->lc_card, seqg_var->lc_axis);
-# line 91 "../action.stt"
+# line 85 "../action.stt"
 			seqg_var->setma_prev = seqg_var->setma;
-# line 92 "../action.stt"
+# line 86 "../action.stt"
 			seqg_var->setmr_prev = seqg_var->setmr;
-# line 93 "../action.stt"
+# line 87 "../action.stt"
 			seqg_var->setvel_prev = seqg_var->setvel;
 		}
 		return;
@@ -143,35 +137,35 @@ static void seqg_action_motor_action_0_init(SS_ID seqg_env, int seqg_trn, int *s
 /* Event function for state "idle" in state set "motor_action" */
 static seqBool seqg_event_motor_action_0_idle(SS_ID seqg_env, int *seqg_ptrn, int *seqg_pnst)
 {
-# line 99 "../action.stt"
+# line 93 "../action.stt"
 	if (seqg_var->reqmotor == 1)
 	{
 		*seqg_pnst = 7;
 		*seqg_ptrn = 0;
 		return TRUE;
 	}
-# line 102 "../action.stt"
+# line 96 "../action.stt"
 	if (seqg_var->reqhome == 1)
 	{
 		*seqg_pnst = 7;
 		*seqg_ptrn = 1;
 		return TRUE;
 	}
-# line 105 "../action.stt"
+# line 99 "../action.stt"
 	if (seqg_var->setma != seqg_var->setma_prev)
 	{
 		*seqg_pnst = 7;
 		*seqg_ptrn = 2;
 		return TRUE;
 	}
-# line 110 "../action.stt"
+# line 104 "../action.stt"
 	if (seqg_var->setmr != seqg_var->setmr_prev)
 	{
 		*seqg_pnst = 7;
 		*seqg_ptrn = 3;
 		return TRUE;
 	}
-# line 116 "../action.stt"
+# line 110 "../action.stt"
 	if (seqg_var->setvel != seqg_var->setvel_prev)
 	{
 		*seqg_pnst = 7;
@@ -194,67 +188,67 @@ static void seqg_action_motor_action_0_idle(SS_ID seqg_env, int seqg_trn, int *s
 	{
 	case 0:
 		{
-# line 100 "../action.stt"
+# line 94 "../action.stt"
 			printf("Request On/Off Motor\n");
 		}
 		return;
 	case 1:
 		{
-# line 103 "../action.stt"
+# line 97 "../action.stt"
 			printf("Homing for %s_%s_%s\n", seqg_var->lc_motor, seqg_var->lc_card, seqg_var->lc_axis);
 		}
 		return;
 	case 2:
 		{
-# line 106 "../action.stt"
+# line 100 "../action.stt"
 			printf("Move Abs for %s_%s_%s=%.3f\n", seqg_var->lc_motor, seqg_var->lc_card, seqg_var->lc_axis, seqg_var->setma);
-# line 107 "../action.stt"
+# line 101 "../action.stt"
 			seqg_var->setma_prev = seqg_var->setma;
-# line 108 "../action.stt"
+# line 102 "../action.stt"
 			seqg_var->status_ma = 1;
 		}
 		return;
 	case 3:
 		{
-# line 111 "../action.stt"
+# line 105 "../action.stt"
 			printf("Move Rel for %s_%s_%s=%.3f\n", seqg_var->lc_motor, seqg_var->lc_card, seqg_var->lc_axis, seqg_var->setmr);
-# line 113 "../action.stt"
+# line 107 "../action.stt"
 			seqg_var->setmr_prev = seqg_var->setmr;
-# line 114 "../action.stt"
+# line 108 "../action.stt"
 			seqg_var->status_mr = 1;
 		}
 		return;
 	case 4:
 		{
-# line 117 "../action.stt"
+# line 111 "../action.stt"
 			printf("Vel for %s_%s_%s=%.3f\n", seqg_var->lc_motor, seqg_var->lc_card, seqg_var->lc_axis, seqg_var->setvel);
-# line 118 "../action.stt"
+# line 112 "../action.stt"
 			seqg_var->setvel_prev = seqg_var->setvel;
-# line 119 "../action.stt"
+# line 113 "../action.stt"
 			seqg_var->status_vel = 1;
 		}
 		return;
 	case 5:
 		{
-# line 123 "../action.stt"
+# line 117 "../action.stt"
 			seq_pvGetTmo(seqg_env, 3/*reqmotor*/, SYNC, DEFAULT_TIMEOUT);
+# line 118 "../action.stt"
+			epicsThreadSleep(0.1);
+# line 119 "../action.stt"
+			seq_pvGetTmo(seqg_env, 5/*reqhome*/, SYNC, DEFAULT_TIMEOUT);
+# line 120 "../action.stt"
+			epicsThreadSleep(0.1);
+# line 121 "../action.stt"
+			seq_pvGetTmo(seqg_env, 7/*setma*/, SYNC, DEFAULT_TIMEOUT);
+# line 122 "../action.stt"
+			epicsThreadSleep(0.1);
+# line 123 "../action.stt"
+			seq_pvGetTmo(seqg_env, 9/*setmr*/, SYNC, DEFAULT_TIMEOUT);
 # line 124 "../action.stt"
 			epicsThreadSleep(0.1);
 # line 125 "../action.stt"
-			seq_pvGetTmo(seqg_env, 5/*reqhome*/, SYNC, DEFAULT_TIMEOUT);
-# line 126 "../action.stt"
-			epicsThreadSleep(0.1);
-# line 127 "../action.stt"
-			seq_pvGetTmo(seqg_env, 7/*setma*/, SYNC, DEFAULT_TIMEOUT);
-# line 128 "../action.stt"
-			epicsThreadSleep(0.1);
-# line 129 "../action.stt"
-			seq_pvGetTmo(seqg_env, 9/*setmr*/, SYNC, DEFAULT_TIMEOUT);
-# line 130 "../action.stt"
-			epicsThreadSleep(0.1);
-# line 131 "../action.stt"
 			seq_pvGetTmo(seqg_env, 11/*setvel*/, SYNC, DEFAULT_TIMEOUT);
-# line 132 "../action.stt"
+# line 126 "../action.stt"
 			epicsThreadSleep(0.5);
 		}
 		return;
@@ -282,26 +276,26 @@ static void seqg_action_motor_action_0_act_motor(SS_ID seqg_env, int seqg_trn, i
 	{
 	case 0:
 		{
-# line 138 "../action.stt"
+# line 132 "../action.stt"
 			if (seqg_var->status_controller == 0)
 			{
-# line 139 "../action.stt"
+# line 133 "../action.stt"
 				seqg_var->status_controller = 1;
 			}
 			else
 			{
-# line 141 "../action.stt"
+# line 135 "../action.stt"
 				seqg_var->status_controller = 0;
 			}
-# line 143 "../action.stt"
+# line 137 "../action.stt"
 			printf("Motor is On(1)/Off(0) = %d\n", seqg_var->status_controller);
-# line 144 "../action.stt"
+# line 138 "../action.stt"
 			seqg_var->motor = seqg_var->status_controller;
-# line 145 "../action.stt"
+# line 139 "../action.stt"
 			seq_pvPutTmo(seqg_env, 4/*motor*/, SYNC, DEFAULT_TIMEOUT);
-# line 146 "../action.stt"
+# line 140 "../action.stt"
 			seqg_var->reqmotor = 0;
-# line 147 "../action.stt"
+# line 141 "../action.stt"
 			seq_pvPutTmo(seqg_env, 3/*reqmotor*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -329,13 +323,13 @@ static void seqg_action_motor_action_0_act_homing(SS_ID seqg_env, int seqg_trn, 
 	{
 	case 0:
 		{
-# line 153 "../action.stt"
+# line 147 "../action.stt"
 			seqg_var->home = 1;
-# line 154 "../action.stt"
+# line 148 "../action.stt"
 			seq_pvPutTmo(seqg_env, 6/*home*/, SYNC, DEFAULT_TIMEOUT);
-# line 155 "../action.stt"
+# line 149 "../action.stt"
 			seqg_var->reqhome = 0;
-# line 156 "../action.stt"
+# line 150 "../action.stt"
 			seq_pvPutTmo(seqg_env, 5/*reqhome*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -363,9 +357,9 @@ static void seqg_action_motor_action_0_act_ma(SS_ID seqg_env, int seqg_trn, int 
 	{
 	case 0:
 		{
-# line 163 "../action.stt"
+# line 157 "../action.stt"
 			seqg_var->ma = real_to_mech(seqg_var->mres, seqg_var->setma, seqg_var->polarity);
-# line 164 "../action.stt"
+# line 158 "../action.stt"
 			seq_pvPutTmo(seqg_env, 8/*ma*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -393,15 +387,15 @@ static void seqg_action_motor_action_0_act_mr(SS_ID seqg_env, int seqg_trn, int 
 	{
 	case 0:
 		{
-# line 170 "../action.stt"
+# line 164 "../action.stt"
 			seqg_var->mr = real_to_mech(seqg_var->mres, seqg_var->setmr, seqg_var->polarity);
-# line 171 "../action.stt"
+# line 165 "../action.stt"
 			seq_pvPutTmo(seqg_env, 10/*mr*/, SYNC, DEFAULT_TIMEOUT);
-# line 172 "../action.stt"
+# line 166 "../action.stt"
 			seqg_var->setmr = 0;
-# line 173 "../action.stt"
+# line 167 "../action.stt"
 			seq_pvPutTmo(seqg_env, 9/*setmr*/, SYNC, DEFAULT_TIMEOUT);
-# line 174 "../action.stt"
+# line 168 "../action.stt"
 			seqg_var->setmr_prev = 0;
 		}
 		return;
@@ -429,11 +423,11 @@ static void seqg_action_motor_action_0_act_vel(SS_ID seqg_env, int seqg_trn, int
 	{
 	case 0:
 		{
-# line 183 "../action.stt"
+# line 177 "../action.stt"
 			seqg_var->vel_pol = 1.0;
-# line 184 "../action.stt"
+# line 178 "../action.stt"
 			seqg_var->vel = real_to_mech(seqg_var->mres, seqg_var->setvel, seqg_var->vel_pol);
-# line 185 "../action.stt"
+# line 179 "../action.stt"
 			seq_pvPutTmo(seqg_env, 12/*vel*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -445,35 +439,35 @@ static void seqg_action_motor_action_0_act_vel(SS_ID seqg_env, int seqg_trn, int
 /* Event function for state "check_err" in state set "motor_action" */
 static seqBool seqg_event_motor_action_0_check_err(SS_ID seqg_env, int *seqg_ptrn, int *seqg_pnst)
 {
-# line 192 "../action.stt"
+# line 186 "../action.stt"
 	if (seqg_var->reqmotor == 1)
 	{
 		*seqg_pnst = 2;
 		*seqg_ptrn = 0;
 		return TRUE;
 	}
-# line 196 "../action.stt"
+# line 190 "../action.stt"
 	if (seqg_var->reqhome == 1)
 	{
 		*seqg_pnst = 3;
 		*seqg_ptrn = 1;
 		return TRUE;
 	}
-# line 200 "../action.stt"
+# line 194 "../action.stt"
 	if (seqg_var->status_ma == 1)
 	{
 		*seqg_pnst = 4;
 		*seqg_ptrn = 2;
 		return TRUE;
 	}
-# line 205 "../action.stt"
+# line 199 "../action.stt"
 	if (seqg_var->status_mr == 1)
 	{
 		*seqg_pnst = 5;
 		*seqg_ptrn = 3;
 		return TRUE;
 	}
-# line 210 "../action.stt"
+# line 204 "../action.stt"
 	if (seqg_var->status_vel == 1)
 	{
 		*seqg_pnst = 6;
@@ -496,55 +490,55 @@ static void seqg_action_motor_action_0_check_err(SS_ID seqg_env, int seqg_trn, i
 	{
 	case 0:
 		{
-# line 193 "../action.stt"
+# line 187 "../action.stt"
 			printf("Check Error in Request Mode\n");
-# line 194 "../action.stt"
+# line 188 "../action.stt"
 			seq_pvPutTmo(seqg_env, 0/*check_err_act*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 1:
 		{
-# line 197 "../action.stt"
+# line 191 "../action.stt"
 			printf("Check Error in Homing Mode\n");
-# line 198 "../action.stt"
+# line 192 "../action.stt"
 			seq_pvPutTmo(seqg_env, 0/*check_err_act*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 2:
 		{
-# line 201 "../action.stt"
+# line 195 "../action.stt"
 			printf("Check Error in Move Abs Mode\n");
-# line 202 "../action.stt"
+# line 196 "../action.stt"
 			seqg_var->status_ma = 0;
-# line 203 "../action.stt"
+# line 197 "../action.stt"
 			seq_pvPutTmo(seqg_env, 0/*check_err_act*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 3:
 		{
-# line 206 "../action.stt"
+# line 200 "../action.stt"
 			printf("Check Error in Move Rel Mode\n");
-# line 207 "../action.stt"
+# line 201 "../action.stt"
 			seqg_var->status_mr = 0;
-# line 208 "../action.stt"
+# line 202 "../action.stt"
 			seq_pvPutTmo(seqg_env, 0/*check_err_act*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 4:
 		{
-# line 211 "../action.stt"
+# line 205 "../action.stt"
 			printf("Check Error in Velocity Mode\n");
-# line 212 "../action.stt"
+# line 206 "../action.stt"
 			seqg_var->status_vel = 0;
-# line 213 "../action.stt"
+# line 207 "../action.stt"
 			seq_pvPutTmo(seqg_env, 0/*check_err_act*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 5:
 		{
-# line 216 "../action.stt"
+# line 210 "../action.stt"
 			printf("Check Error in State End of Cycle\n");
-# line 217 "../action.stt"
+# line 211 "../action.stt"
 			seq_pvPutTmo(seqg_env, 0/*check_err_act*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
