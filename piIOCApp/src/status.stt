@@ -117,9 +117,7 @@ ss motor_snl {
 			pvPut(status_mode,SYNC);
 		} state check_err
 		when() {
-//			serve solo per debug... poi da togliere
-//			printf("IOC%s_%s waiting for check", lc_card, lc_axis);
-			epicsThreadSleep(1.0);
+//			epicsThreadSleep(1.0);
 		} state idle
 	}
 //

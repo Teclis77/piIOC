@@ -206,8 +206,6 @@ static void seqg_action_motor_snl_0_idle(SS_ID seqg_env, int seqg_trn, int *seqg
 		return;
 	case 3:
 		{
-# line 122 "../status.stt"
-			epicsThreadSleep(1.0);
 		}
 		return;
 	}
@@ -234,65 +232,65 @@ static void seqg_action_motor_snl_0_check_status(SS_ID seqg_env, int seqg_trn, i
 	{
 	case 0:
 		{
-# line 128 "../status.stt"
+# line 126 "../status.stt"
 			int ms_raw_int;
-# line 130 "../status.stt"
+# line 128 "../status.stt"
 			seqg_var->ms_status_proc = 1;
-# line 131 "../status.stt"
+# line 129 "../status.stt"
 			seq_pvPutTmo(seqg_env, 17/*ms_status_proc*/, SYNC, DEFAULT_TIMEOUT);
-# line 132 "../status.stt"
+# line 130 "../status.stt"
 			epicsThreadSleep(0.1);
-# line 134 "../status.stt"
+# line 132 "../status.stt"
 			seq_pvGetTmo(seqg_env, 5/*ms_status*/, SYNC, DEFAULT_TIMEOUT);
-# line 137 "../status.stt"
+# line 135 "../status.stt"
 			parse_motor_status_from_string(seqg_var->ms_status, &g_motor_status);
-# line 138 "../status.stt"
+# line 136 "../status.stt"
 			ms_raw_int = (int)g_motor_status.raw;
-# line 140 "../status.stt"
+# line 138 "../status.stt"
 			if (!g_motor_status.power_on)
 			{
-# line 141 "../status.stt"
+# line 139 "../status.stt"
 				printf("ERRORE: motore spento!\n");
 			}
-# line 143 "../status.stt"
+# line 141 "../status.stt"
 			if (g_motor_status.limit_right || g_motor_status.limit_left)
 			{
-# line 144 "../status.stt"
+# line 142 "../status.stt"
 				printf("ATTENZIONE: limite scattato!\n");
 			}
-# line 146 "../status.stt"
+# line 144 "../status.stt"
 			if (g_motor_status.in_motion)
 			{
-# line 147 "../status.stt"
+# line 145 "../status.stt"
 				printf("Motore in movimento\n");
 			}
-# line 149 "../status.stt"
+# line 147 "../status.stt"
 			if (g_motor_status.error)
 			{
-# line 150 "../status.stt"
+# line 148 "../status.stt"
 				printf("ERRORE PENDENTE sul controller!\n");
 			}
-# line 156 "../status.stt"
+# line 154 "../status.stt"
 			printf("%d,%d,%d,%d\n", g_motor_status.power_on, g_motor_status.limit_right, g_motor_status.limit_left, g_motor_status.in_motion);
-# line 158 "../status.stt"
+# line 156 "../status.stt"
 			seqg_var->motor_status = g_motor_status.power_on;
-# line 159 "../status.stt"
+# line 157 "../status.stt"
 			seq_pvPutTmo(seqg_env, 7/*motor_status*/, SYNC, DEFAULT_TIMEOUT);
-# line 160 "../status.stt"
+# line 158 "../status.stt"
 			seqg_var->lim_pos = g_motor_status.limit_right;
-# line 161 "../status.stt"
+# line 159 "../status.stt"
 			seq_pvPutTmo(seqg_env, 8/*lim_pos*/, SYNC, DEFAULT_TIMEOUT);
-# line 162 "../status.stt"
+# line 160 "../status.stt"
 			seqg_var->lim_neg = g_motor_status.limit_left;
-# line 163 "../status.stt"
+# line 161 "../status.stt"
 			seq_pvPutTmo(seqg_env, 9/*lim_neg*/, SYNC, DEFAULT_TIMEOUT);
-# line 165 "../status.stt"
+# line 163 "../status.stt"
 			sprintf(seqg_var->motor_name, "Motor%s", seqg_var->lc_axis);
-# line 166 "../status.stt"
+# line 164 "../status.stt"
 			print_motor_status(seqg_var->motor_name, ms_raw_int);
-# line 168 "../status.stt"
+# line 166 "../status.stt"
 			seqg_var->status_mode = 2;
-# line 169 "../status.stt"
+# line 167 "../status.stt"
 			seq_pvPutTmo(seqg_env, 2/*status_mode*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -320,33 +318,33 @@ static void seqg_action_motor_snl_0_check_status_opt(SS_ID seqg_env, int seqg_tr
 	{
 	case 0:
 		{
-# line 175 "../status.stt"
+# line 173 "../status.stt"
 			int svo_raw_int;
-# line 177 "../status.stt"
+# line 175 "../status.stt"
 			seqg_var->ms_status_opt_proc = 1;
-# line 178 "../status.stt"
+# line 176 "../status.stt"
 			seq_pvPutTmo(seqg_env, 18/*ms_status_opt_proc*/, SYNC, DEFAULT_TIMEOUT);
-# line 179 "../status.stt"
+# line 177 "../status.stt"
 			epicsThreadSleep(0.1);
-# line 181 "../status.stt"
+# line 179 "../status.stt"
 			seq_pvGetTmo(seqg_env, 6/*ms_status_opt*/, SYNC, DEFAULT_TIMEOUT);
-# line 183 "../status.stt"
+# line 181 "../status.stt"
 			svo_raw_int = atoi(seqg_var->ms_status_opt);
-# line 185 "../status.stt"
+# line 183 "../status.stt"
 			parse_total_status(svo_raw_int, &g_motor_status_opt);
-# line 189 "../status.stt"
+# line 187 "../status.stt"
 			seqg_var->mot_moving = g_motor_status.in_motion;
-# line 191 "../status.stt"
+# line 189 "../status.stt"
 			printf("Is It Moving axis %s? = %d\n", seqg_var->lc_axis, seqg_var->mot_moving);
-# line 193 "../status.stt"
+# line 191 "../status.stt"
 			seqg_var->b_moving = (seqg_var->mot_moving != 0) ? 1 : 0;
-# line 194 "../status.stt"
+# line 192 "../status.stt"
 			seq_pvPutTmo(seqg_env, 10/*b_moving*/, SYNC, DEFAULT_TIMEOUT);
-# line 196 "../status.stt"
+# line 194 "../status.stt"
 			print_total_status(svo_raw_int);
-# line 198 "../status.stt"
+# line 196 "../status.stt"
 			seqg_var->status_mode = 3;
-# line 199 "../status.stt"
+# line 197 "../status.stt"
 			seq_pvPutTmo(seqg_env, 2/*status_mode*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -374,25 +372,25 @@ static void seqg_action_motor_snl_0_check_position(SS_ID seqg_env, int seqg_trn,
 	{
 	case 0:
 		{
-# line 204 "../status.stt"
+# line 202 "../status.stt"
 			seq_pvPutTmo(seqg_env, 12/*act_pos*/, SYNC, DEFAULT_TIMEOUT);
-# line 205 "../status.stt"
+# line 203 "../status.stt"
 			epicsThreadSleep(0.1);
-# line 207 "../status.stt"
+# line 205 "../status.stt"
 			seq_pvGetTmo(seqg_env, 12/*act_pos*/, SYNC, DEFAULT_TIMEOUT);
-# line 208 "../status.stt"
+# line 206 "../status.stt"
 			seqg_var->pos = mech_to_real(seqg_var->mres, seqg_var->act_pos, seqg_var->get_pol);
-# line 209 "../status.stt"
+# line 207 "../status.stt"
 			printf("The position is %.3f\n", seqg_var->pos);
-# line 210 "../status.stt"
+# line 208 "../status.stt"
 			seq_pvPutTmo(seqg_env, 13/*pos*/, SYNC, DEFAULT_TIMEOUT);
-# line 211 "../status.stt"
+# line 209 "../status.stt"
 			seqg_var->reqpos = 0;
-# line 212 "../status.stt"
+# line 210 "../status.stt"
 			seq_pvPutTmo(seqg_env, 11/*reqpos*/, SYNC, DEFAULT_TIMEOUT);
-# line 213 "../status.stt"
+# line 211 "../status.stt"
 			seqg_var->status_mode = 4;
-# line 214 "../status.stt"
+# line 212 "../status.stt"
 			seq_pvPutTmo(seqg_env, 2/*status_mode*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -420,25 +418,25 @@ static void seqg_action_motor_snl_0_check_velocity(SS_ID seqg_env, int seqg_trn,
 	{
 	case 0:
 		{
-# line 219 "../status.stt"
+# line 217 "../status.stt"
 			seq_pvPutTmo(seqg_env, 15/*act_vel*/, SYNC, DEFAULT_TIMEOUT);
-# line 220 "../status.stt"
+# line 218 "../status.stt"
 			epicsThreadSleep(0.1);
-# line 222 "../status.stt"
+# line 220 "../status.stt"
 			seq_pvGetTmo(seqg_env, 15/*act_vel*/, SYNC, DEFAULT_TIMEOUT);
-# line 223 "../status.stt"
+# line 221 "../status.stt"
 			seqg_var->real_vel = mech_to_real(seqg_var->mres, seqg_var->act_vel, seqg_var->get_pol);
-# line 224 "../status.stt"
+# line 222 "../status.stt"
 			printf("The velocity is %.3f\n", seqg_var->real_vel);
-# line 225 "../status.stt"
+# line 223 "../status.stt"
 			seq_pvPutTmo(seqg_env, 16/*real_vel*/, SYNC, DEFAULT_TIMEOUT);
-# line 226 "../status.stt"
+# line 224 "../status.stt"
 			seqg_var->reqvel = 0;
-# line 227 "../status.stt"
+# line 225 "../status.stt"
 			seq_pvPutTmo(seqg_env, 14/*reqvel*/, SYNC, DEFAULT_TIMEOUT);
-# line 228 "../status.stt"
+# line 226 "../status.stt"
 			seqg_var->status_mode = 0;
-# line 229 "../status.stt"
+# line 227 "../status.stt"
 			seq_pvPutTmo(seqg_env, 2/*status_mode*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
@@ -450,28 +448,28 @@ static void seqg_action_motor_snl_0_check_velocity(SS_ID seqg_env, int seqg_trn,
 /* Event function for state "check_err" in state set "motor_snl" */
 static seqBool seqg_event_motor_snl_0_check_err(SS_ID seqg_env, int *seqg_ptrn, int *seqg_pnst)
 {
-# line 233 "../status.stt"
+# line 231 "../status.stt"
 	if (seqg_var->status_mode == 1)
 	{
 		*seqg_pnst = 2;
 		*seqg_ptrn = 0;
 		return TRUE;
 	}
-# line 237 "../status.stt"
+# line 235 "../status.stt"
 	if (seqg_var->status_mode == 2)
 	{
 		*seqg_pnst = 3;
 		*seqg_ptrn = 1;
 		return TRUE;
 	}
-# line 241 "../status.stt"
+# line 239 "../status.stt"
 	if (seqg_var->status_mode == 3)
 	{
 		*seqg_pnst = 4;
 		*seqg_ptrn = 2;
 		return TRUE;
 	}
-# line 245 "../status.stt"
+# line 243 "../status.stt"
 	if (seqg_var->status_mode == 4)
 	{
 		*seqg_pnst = 5;
@@ -494,41 +492,41 @@ static void seqg_action_motor_snl_0_check_err(SS_ID seqg_env, int seqg_trn, int 
 	{
 	case 0:
 		{
-# line 234 "../status.stt"
+# line 232 "../status.stt"
 			printf("Check Error in State %d\n", seqg_var->status_mode);
-# line 235 "../status.stt"
+# line 233 "../status.stt"
 			seq_pvPutTmo(seqg_env, 4/*check_err*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 1:
 		{
-# line 238 "../status.stt"
+# line 236 "../status.stt"
 			printf("Check Error in State %d\n", seqg_var->status_mode);
-# line 239 "../status.stt"
+# line 237 "../status.stt"
 			seq_pvPutTmo(seqg_env, 4/*check_err*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 2:
 		{
-# line 242 "../status.stt"
+# line 240 "../status.stt"
 			printf("Check Error in State %d\n", seqg_var->status_mode);
-# line 243 "../status.stt"
+# line 241 "../status.stt"
 			seq_pvPutTmo(seqg_env, 4/*check_err*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 3:
 		{
-# line 246 "../status.stt"
+# line 244 "../status.stt"
 			printf("Check Error in State %d\n", seqg_var->status_mode);
-# line 247 "../status.stt"
+# line 245 "../status.stt"
 			seq_pvPutTmo(seqg_env, 4/*check_err*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;
 	case 4:
 		{
-# line 250 "../status.stt"
+# line 248 "../status.stt"
 			printf("Check Error in State %d\n", seqg_var->status_mode);
-# line 251 "../status.stt"
+# line 249 "../status.stt"
 			seq_pvPutTmo(seqg_env, 4/*check_err*/, SYNC, DEFAULT_TIMEOUT);
 		}
 		return;

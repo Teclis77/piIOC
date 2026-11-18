@@ -123,7 +123,7 @@ ss motor_action {
 			pvGet(setmr,SYNC);
 			epicsThreadSleep(0.1);
 			pvGet(setvel,SYNC);
-			epicsThreadSleep(0.5);
+			epicsThreadSleep(0.1);
 		} state idle
 	}
 //

@@ -249,7 +249,7 @@ static void seqg_action_motor_action_0_idle(SS_ID seqg_env, int seqg_trn, int *s
 # line 125 "../action.stt"
 			seq_pvGetTmo(seqg_env, 11/*setvel*/, SYNC, DEFAULT_TIMEOUT);
 # line 126 "../action.stt"
-			epicsThreadSleep(0.5);
+			epicsThreadSleep(0.1);
 		}
 		return;
 	}
